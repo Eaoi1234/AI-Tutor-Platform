@@ -6,12 +6,13 @@ import { LoginPage } from './components/auth/LoginPage';
 import { RegisterPage } from './components/auth/RegisterPage';
 import { ProfilePage } from './components/profile/ProfilePage';
 import { SubjectDashboard } from './components/subjects/SubjectDashboard';
+import { StudyDashboard } from './components/analytics/StudyDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Subject } from './types';
 import { mockUser, subjects, weakAreas, recentSessions } from './data/mockData';
-import { Sun,  Moon, User, LogOut, BookOpen } from 'lucide-react';
+import { Sun,  Moon, User, LogOut, BookOpen, BarChart3 } from 'lucide-react';
 
-type AppState = 'dashboard' | 'chat' | 'quiz' | 'profile' | 'subjects';
+type AppState = 'dashboard' | 'chat' | 'quiz' | 'profile' | 'subjects' | 'analytics';
 type AuthState = 'login' | 'register';
 
 function AppContent() {
@@ -156,6 +157,20 @@ function AppContent() {
                   <BookOpen className="w-4 h-4 mr-3" />
                   My Subjects
                 </button>
+                <button
+                  onClick={() => {
+                    setCurrentView('analytics');
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
+                    darkMode 
+                      ? 'text-gray-300 hover:bg-gray-700' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4 mr-3" />
+                  Study Analytics
+                </button>
                 <hr className={`my-2 ${darkMode ? 'border-gray-600' : 'border-gray-200'}`} />
                 <button
                   onClick={() => {
@@ -223,6 +238,17 @@ function AppContent() {
           <DarkModeToggle />
           <UserMenu />
           <SubjectDashboard
+            onBack={handleBackToDashboard}
+            darkMode={darkMode}
+          />
+        </>
+      );
+    case 'analytics':
+      return (
+        <>
+          <DarkModeToggle />
+          <UserMenu />
+          <StudyDashboard
             onBack={handleBackToDashboard}
             darkMode={darkMode}
           />

@@ -101,6 +101,16 @@ const mockUser: AuthUser = {
   },
 };
 
+// Helper function to convert date strings back to Date objects
+const convertDatesToObjects = (user: any): AuthUser => {
+  return {
+    ...user,
+    dateOfBirth: new Date(user.dateOfBirth),
+    joinDate: new Date(user.joinDate),
+    lastLogin: new Date(user.lastLogin),
+  };
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
@@ -109,7 +119,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedUser = localStorage.getItem('authUser');
     if (storedUser) {
       try {
-        const user = JSON.parse(storedUser);
+        const parsedUser = JSON.parse(storedUser);
+        const user = convertDatesToObjects(parsedUser);
         dispatch({ type: 'LOGIN_SUCCESS', payload: user });
       } catch (error) {
         localStorage.removeItem('authUser');

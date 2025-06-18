@@ -7,12 +7,17 @@ import { RegisterPage } from './components/auth/RegisterPage';
 import { ProfilePage } from './components/profile/ProfilePage';
 import { SubjectDashboard } from './components/subjects/SubjectDashboard';
 import { StudyDashboard } from './components/analytics/StudyDashboard';
+import { AdminDashboard } from './components/admin/AdminDashboard';
+import { SubjectCatalog } from './components/learning/SubjectCatalog';
+import { DailyQuizzes } from './components/learning/DailyQuizzes';
+import { DiscussionForums } from './components/learning/DiscussionForums';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Subject } from './types';
+import { CoreSubject } from './types/learning';
 import { mockUser, subjects, weakAreas, recentSessions } from './data/mockData';
-import { Sun,  Moon, User, LogOut, BookOpen, BarChart3 } from 'lucide-react';
+import { Sun, Moon, User, LogOut, BookOpen, BarChart3, Settings, MessageSquare, Target, GraduationCap } from 'lucide-react';
 
-type AppState = 'dashboard' | 'chat' | 'quiz' | 'profile' | 'subjects' | 'analytics';
+type AppState = 'dashboard' | 'chat' | 'quiz' | 'profile' | 'subjects' | 'analytics' | 'admin' | 'catalog' | 'daily-quizzes' | 'forums';
 type AuthState = 'login' | 'register';
 
 function AppContent() {
@@ -20,6 +25,7 @@ function AppContent() {
   const [currentView, setCurrentView] = useState<AppState>('dashboard');
   const [authView, setAuthView] = useState<AuthState>('login');
   const [selectedSubject, setSelectedSubject] = useState<Subject | undefined>(undefined);
+  const [selectedCoreSubject, setSelectedCoreSubject] = useState<CoreSubject | undefined>(undefined);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : false;
@@ -28,6 +34,9 @@ function AppContent() {
     const saved = localStorage.getItem('bookmarkedSubjects');
     return saved ? JSON.parse(saved) : [];
   });
+
+  // Check if user is admin (mock check)
+  const isAdmin = user?.email === 'admin@example.com';
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
@@ -47,6 +56,23 @@ function AppContent() {
     setCurrentView('chat');
   };
 
+  const handleSelectCoreSubject = (subject: CoreSubject) => {
+    setSelectedCoreSubject(subject);
+    // Convert CoreSubject to Subject for compatibility
+    const convertedSubject: Subject = {
+      id: subject.id,
+      name: subject.name,
+      icon: 'BookOpen',
+      description: subject.description,
+      color: subject.color,
+      totalTopics: subject.topics.length,
+      completedTopics: subject.topics.filter(t => t.isCompleted).length,
+      difficulty: subject.difficulty as 'Beginner' | 'Intermediate' | 'Advanced'
+    };
+    setSelectedSubject(convertedSubject);
+    setCurrentView('chat');
+  };
+
   const handleStartChat = () => {
     setSelectedSubject(undefined);
     setCurrentView('chat');
@@ -60,11 +86,11 @@ function AppContent() {
   const handleBackToDashboard = () => {
     setCurrentView('dashboard');
     setSelectedSubject(undefined);
+    setSelectedCoreSubject(undefined);
   };
 
   const handleQuizComplete = (score: number, weakAreasIdentified: string[]) => {
     console.log('Quiz completed:', { score, weakAreasIdentified });
-    // In a real app, this would update the user's progress and weak areas
   };
 
   const toggleDarkMode = () => {
@@ -145,6 +171,48 @@ function AppContent() {
                 </button>
                 <button
                   onClick={() => {
+                    setCurrentView('catalog');
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
+                    darkMode 
+                      ? 'text-gray-300 hover:bg-gray-700' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <GraduationCap className="w-4 h-4 mr-3" />
+                  Subject Catalog
+                </button>
+                <button
+                  onClick={() => {
+                    setCurrentView('daily-quizzes');
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
+                    darkMode 
+                      ? 'text-gray-300 hover:bg-gray-700' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <Target className="w-4 h-4 mr-3" />
+                  Daily Quizzes
+                </button>
+                <button
+                  onClick={() => {
+                    setCurrentView('forums');
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
+                    darkMode 
+                      ? 'text-gray-300 hover:bg-gray-700' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <MessageSquare className="w-4 h-4 mr-3" />
+                  Discussion Forums
+                </button>
+                <button
+                  onClick={() => {
                     setCurrentView('subjects');
                     setIsOpen(false);
                   }}
@@ -171,6 +239,22 @@ function AppContent() {
                   <BarChart3 className="w-4 h-4 mr-3" />
                   Study Analytics
                 </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => {
+                      setCurrentView('admin');
+                      setIsOpen(false);
+                    }}
+                    className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
+                      darkMode 
+                        ? 'text-gray-300 hover:bg-gray-700' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Settings className="w-4 h-4 mr-3" />
+                    Admin Panel
+                  </button>
+                )}
                 <hr className={`my-2 ${darkMode ? 'border-gray-600' : 'border-gray-200'}`} />
                 <button
                   onClick={() => {
@@ -252,6 +336,41 @@ function AppContent() {
             onBack={handleBackToDashboard}
             darkMode={darkMode}
           />
+        </>
+      );
+    case 'admin':
+      return (
+        <>
+          <DarkModeToggle />
+          <UserMenu />
+          <AdminDashboard darkMode={darkMode} />
+        </>
+      );
+    case 'catalog':
+      return (
+        <>
+          <DarkModeToggle />
+          <UserMenu />
+          <SubjectCatalog
+            darkMode={darkMode}
+            onSelectSubject={handleSelectCoreSubject}
+          />
+        </>
+      );
+    case 'daily-quizzes':
+      return (
+        <>
+          <DarkModeToggle />
+          <UserMenu />
+          <DailyQuizzes darkMode={darkMode} />
+        </>
+      );
+    case 'forums':
+      return (
+        <>
+          <DarkModeToggle />
+          <UserMenu />
+          <DiscussionForums darkMode={darkMode} />
         </>
       );
     case 'chat':

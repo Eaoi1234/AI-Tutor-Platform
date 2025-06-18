@@ -415,114 +415,18 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ onBack, dark
           </div>
         </div>
 
-        {/* Subject Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSubjects.map((subject) => {
-            const progress = (subject.progress.completedTopics / subject.progress.totalTopics) * 100;
-            
-            return (
-              <div
-                key={subject.id}
-                onClick={() => setSelectedSubject(subject)}
-                className={`group cursor-pointer border rounded-xl p-6 hover:border-blue-400 hover:shadow-lg transition-all duration-200 ${
-                  darkMode 
-                    ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' 
-                    : 'bg-white border-gray-200'
-                }`}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${subject.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <BookOpen className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(subject.enrollmentStatus)}`}>
-                      {subject.enrollmentStatus}
-                    </div>
-                  </div>
-                </div>
-                
-                <h3 className={`text-lg font-semibold mb-1 group-hover:text-blue-600 transition-colors ${
-                  darkMode ? 'text-white' : 'text-gray-900'
-                }`}>
-                  {subject.name}
-                </h3>
-                <p className={`text-sm mb-2 transition-colors duration-300 ${
-                  darkMode ? 'text-gray-400' : 'text-gray-600'
-                }`}>{subject.code}</p>
-                <p className={`text-sm mb-4 line-clamp-2 transition-colors duration-300 ${
-                  darkMode ? 'text-gray-400' : 'text-gray-600'
-                }`}>{subject.description}</p>
-                
-                {/* Instructor */}
-                <div className="flex items-center space-x-2 mb-4">
-                  <img
-                    src={subject.instructor.avatar}
-                    alt={subject.instructor.name}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                  <span className={`text-sm transition-colors duration-300 ${
-                    darkMode ? 'text-gray-400' : 'text-gray-600'
-                  }`}>{subject.instructor.name}</span>
-                </div>
-
-                {/* Progress */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span className={`transition-colors duration-300 ${
-                      darkMode ? 'text-gray-400' : 'text-gray-600'
-                    }`}>Progress</span>
-                    <span className={`font-medium transition-colors duration-300 ${
-                      darkMode ? 'text-white' : 'text-gray-900'
-                    }`}>{Math.round(progress)}%</span>
-                  </div>
-                  <div className={`w-full rounded-full h-2 ${
-                    darkMode ? 'bg-gray-700' : 'bg-gray-200'
-                  }`}>
-                    <div
-                      className={`h-2 rounded-full bg-gradient-to-r ${subject.color} transition-all duration-500`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center space-x-4">
-                    <span className={`flex items-center transition-colors duration-300 ${
-                      darkMode ? 'text-gray-400' : 'text-gray-600'
-                    }`}>
-                      <Users className="w-4 h-4 mr-1" />
-                      {subject.capacity.current}/{subject.capacity.max}
-                    </span>
-                    <span className={`flex items-center transition-colors duration-300 ${
-                      darkMode ? 'text-gray-400' : 'text-gray-600'
-                    }`}>
-                      <Star className="w-4 h-4 mr-1" />
-                      {subject.grades.current}
-                    </span>
-                  </div>
-                  <ChevronRight className={`w-4 h-4 group-hover:text-blue-600 transition-colors ${
-                    darkMode ? 'text-gray-400' : 'text-gray-400'
-                  }`} />
-                </div>
-              </div>
-            );
-          })}
+        {/* Empty State */}
+        <div className="text-center py-12">
+          <BookOpen className={`w-16 h-16 mx-auto mb-4 transition-colors duration-300 ${
+            darkMode ? 'text-gray-600' : 'text-gray-400'
+          }`} />
+          <h3 className={`text-lg font-medium mb-2 transition-colors duration-300 ${
+            darkMode ? 'text-white' : 'text-gray-900'
+          }`}>My Subjects</h3>
+          <p className={`transition-colors duration-300 ${
+            darkMode ? 'text-gray-400' : 'text-gray-600'
+          }`}>Your enrolled subjects will appear here</p>
         </div>
-
-        {filteredSubjects.length === 0 && (
-          <div className="text-center py-12">
-            <BookOpen className={`w-16 h-16 mx-auto mb-4 transition-colors duration-300 ${
-              darkMode ? 'text-gray-600' : 'text-gray-400'
-            }`} />
-            <h3 className={`text-lg font-medium mb-2 transition-colors duration-300 ${
-              darkMode ? 'text-white' : 'text-gray-900'
-            }`}>No subjects found</h3>
-            <p className={`transition-colors duration-300 ${
-              darkMode ? 'text-gray-400' : 'text-gray-600'
-            }`}>Try adjusting your search or filter criteria</p>
-          </div>
-        )}
       </div>
     </div>
   );

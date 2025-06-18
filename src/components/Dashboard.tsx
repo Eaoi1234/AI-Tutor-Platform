@@ -52,12 +52,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 }`}>LearnPath</span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <div className={`flex items-center space-x-2 text-sm transition-colors duration-300 ${
                 darkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>
                 <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                 <span>{user.currentStreak} day streak</span>
+              </div>
+              <div className={`flex items-center space-x-2 text-sm transition-colors duration-300 ${
+                darkMode ? 'text-gray-300' : 'text-gray-600'
+              }`}>
+                <Clock className="w-4 h-4" />
+                <span>{Math.floor(user.totalStudyTime / 60)}h study time</span>
               </div>
               <img 
                 src={user.avatar} 
@@ -208,166 +214,68 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Focus Areas */}
-          <div className="lg:col-span-2">
-            <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
-              darkMode ? 'text-white' : 'text-gray-900'
-            }`}>Areas to Focus On</h2>
-            <div className="space-y-4">
-              {weakAreas.map((area, index) => (
-                <div key={index} className={`border rounded-xl p-6 transition-colors duration-300 ${
-                  darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-                }`}>
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className={`font-semibold transition-colors duration-300 ${
-                        darkMode ? 'text-white' : 'text-gray-900'
-                      }`}>{area.topic}</h3>
-                      <p className={`text-sm transition-colors duration-300 ${
-                        darkMode ? 'text-gray-400' : 'text-gray-600'
-                      }`}>{area.subject}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-red-600">{area.accuracy}%</div>
-                      <div className={`text-xs transition-colors duration-300 ${
-                        darkMode ? 'text-gray-500' : 'text-gray-500'
-                      }`}>accuracy</div>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <div className={`w-full rounded-full h-2 ${
-                      darkMode ? 'bg-gray-700' : 'bg-gray-200'
-                    }`}>
-                      <div
-                        className="h-2 rounded-full bg-red-500"
-                        style={{ width: `${area.accuracy}%` }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <p className={`text-sm font-medium transition-colors duration-300 ${
+        {/* Focus Areas */}
+        <div>
+          <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
+            darkMode ? 'text-white' : 'text-gray-900'
+          }`}>Areas to Focus On</h2>
+          <div className="space-y-4">
+            {weakAreas.map((area, index) => (
+              <div key={index} className={`border rounded-xl p-6 transition-colors duration-300 ${
+                darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+              }`}>
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className={`font-semibold transition-colors duration-300 ${
                       darkMode ? 'text-white' : 'text-gray-900'
-                    }`}>Improvement suggestions:</p>
-                    <ul className="space-y-1">
-                      {area.improvementSuggestions.slice(0, 2).map((suggestion, idx) => (
-                        <li key={idx} className={`text-sm flex items-start transition-colors duration-300 ${
-                          darkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
-                          <span className={`w-1 h-1 rounded-full mt-2 mr-2 flex-shrink-0 ${
-                            darkMode ? 'bg-gray-500' : 'bg-gray-400'
-                          }`}></span>
-                          {suggestion}
-                        </li>
-                      ))}
-                    </ul>
+                    }`}>{area.topic}</h3>
+                    <p className={`text-sm transition-colors duration-300 ${
+                      darkMode ? 'text-gray-400' : 'text-gray-600'
+                    }`}>{area.subject}</p>
                   </div>
-                  
-                  <button className="mt-4 text-sm text-yellow-600 hover:text-yellow-700 font-medium flex items-center">
-                    Start practicing
-                    <ArrowRight className="w-3 h-3 ml-1" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Recent Activity */}
-            <div className={`border rounded-xl p-6 transition-colors duration-300 ${
-              darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-            }`}>
-              <h3 className={`font-semibold mb-4 flex items-center transition-colors duration-300 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>
-                <Calendar className={`w-5 h-5 mr-2 transition-colors duration-300 ${
-                  darkMode ? 'text-gray-400' : 'text-gray-600'
-                }`} />
-                Recent Activity
-              </h3>
-              <div className="space-y-3">
-                {recentSessions.slice(0, 4).map((session) => (
-                  <div key={session.id} className="flex items-center justify-between py-2">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-2 h-2 rounded-full ${
-                        session.type === 'quiz' ? 'bg-purple-400' : 'bg-blue-400'
-                      }`}></div>
-                      <div>
-                        <p className={`text-sm font-medium capitalize transition-colors duration-300 ${
-                          darkMode ? 'text-white' : 'text-gray-900'
-                        }`}>{session.type}</p>
-                        <p className={`text-xs transition-colors duration-300 ${
-                          darkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>{session.subject}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className={`text-sm transition-colors duration-300 ${
-                        darkMode ? 'text-white' : 'text-gray-900'
-                      }`}>{session.duration}m</p>
-                      {session.score && (
-                        <p className="text-xs text-green-600">{session.score}%</p>
-                      )}
-                    </div>
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-red-600">{area.accuracy}%</div>
+                    <div className={`text-xs transition-colors duration-300 ${
+                      darkMode ? 'text-gray-500' : 'text-gray-500'
+                    }`}>accuracy</div>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Achievement */}
-            <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl p-6 text-gray-900">
-              <div className="flex items-center mb-3">
-                <Award className="w-6 h-6 mr-2" />
-                <h3 className="font-semibold">Achievement Unlocked!</h3>
-              </div>
-              <p className="text-sm mb-3">You've maintained a {user.currentStreak}-day learning streak!</p>
-              <div className="flex items-center text-sm">
-                <Star className="w-4 h-4 mr-1" />
-                <span>+50 XP earned</span>
-              </div>
-            </div>
-
-            {/* Community */}
-            <div className={`border rounded-xl p-6 transition-colors duration-300 ${
-              darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-            }`}>
-              <h3 className={`font-semibold mb-4 flex items-center transition-colors duration-300 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>
-                <Users className={`w-5 h-5 mr-2 transition-colors duration-300 ${
-                  darkMode ? 'text-gray-400' : 'text-gray-600'
-                }`} />
-                Community
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm transition-colors duration-300 ${
-                    darkMode ? 'text-gray-400' : 'text-gray-600'
-                  }`}>Global learners</span>
-                  <span className={`text-sm font-medium transition-colors duration-300 ${
+                </div>
+                
+                <div className="mb-4">
+                  <div className={`w-full rounded-full h-2 ${
+                    darkMode ? 'bg-gray-700' : 'bg-gray-200'
+                  }`}>
+                    <div
+                      className="h-2 rounded-full bg-red-500"
+                      style={{ width: `${area.accuracy}%` }}
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <p className={`text-sm font-medium transition-colors duration-300 ${
                     darkMode ? 'text-white' : 'text-gray-900'
-                  }`}>12,847</span>
+                  }`}>Improvement suggestions:</p>
+                  <ul className="space-y-1">
+                    {area.improvementSuggestions.slice(0, 2).map((suggestion, idx) => (
+                      <li key={idx} className={`text-sm flex items-start transition-colors duration-300 ${
+                        darkMode ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
+                        <span className={`w-1 h-1 rounded-full mt-2 mr-2 flex-shrink-0 ${
+                          darkMode ? 'bg-gray-500' : 'bg-gray-400'
+                        }`}></span>
+                        {suggestion}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm transition-colors duration-300 ${
-                    darkMode ? 'text-gray-400' : 'text-gray-600'
-                  }`}>Your rank</span>
-                  <span className={`text-sm font-medium transition-colors duration-300 ${
-                    darkMode ? 'text-white' : 'text-gray-900'
-                  }`}>#1,234</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm transition-colors duration-300 ${
-                    darkMode ? 'text-gray-400' : 'text-gray-600'
-                  }`}>This week</span>
-                  <span className="text-sm font-medium text-green-600">↑ 23 positions</span>
-                </div>
+                
+                <button className="mt-4 text-sm text-yellow-600 hover:text-yellow-700 font-medium flex items-center">
+                  Start practicing
+                  <ArrowRight className="w-3 h-3 ml-1" />
+                </button>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

@@ -7,6 +7,11 @@ import { RegisterPage } from './components/auth/RegisterPage';
 import { ProfilePage } from './components/profile/ProfilePage';
 import { SubjectDashboard } from './components/subjects/SubjectDashboard';
 import { StudyDashboard } from './components/analytics/StudyDashboard';
+import { Navbar } from './components/common/Navbar';
+import { AdminDashboard } from './components/admin/AdminDashboard';
+import { SubjectCatalog } from './components/learning/SubjectCatalog';
+import { DailyQuizzes } from './components/learning/DailyQuizzes';
+import { DiscussionForums } from './components/learning/DiscussionForums';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Subject } from './types';
@@ -101,7 +106,29 @@ function AppContent() {
     );
   };
 
+  const handleNavigation = (view: AppState) => {
+    setCurrentView(view);
   };
+
+  const DarkModeToggle = () => (
+    <button
+      onClick={toggleDarkMode}
+      className="fixed top-4 right-20 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg"
+    >
+      {darkMode ? '☀️' : '🌙'}
+    </button>
+  );
+
+  const UserMenu = () => (
+    <div className="fixed top-4 right-4 z-50">
+      <button
+        onClick={logout}
+        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+      >
+        Logout
+      </button>
+    </div>
+  );
 
   // If not authenticated, show auth pages
   if (!isAuthenticated) {

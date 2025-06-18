@@ -29,13 +29,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const totalProgress = subjects.reduce((acc, subject) => acc + (subject.completedTopics / subject.totalTopics), 0) / subjects.length * 100;
 
-  const handleQuizClick = (e: React.MouseEvent, subject: Subject) => {
-    e.stopPropagation();
-    onSelectSubject(subject);
-    // This will trigger quiz mode in the parent component
-    setTimeout(() => onStartQuiz(), 100);
-  };
-
   const handleBookmarkClick = (e: React.MouseEvent, subjectId: string) => {
     e.stopPropagation();
     onToggleBookmark(subjectId);
@@ -110,42 +103,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <Target className="w-5 h-5 mr-2" />
               Take Practice Quiz
             </button>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className={`text-3xl font-bold transition-colors duration-300 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>{Math.round(totalProgress)}%</div>
-              <div className={`text-sm transition-colors duration-300 ${
-                darkMode ? 'text-gray-400' : 'text-gray-600'
-              }`}>Overall Progress</div>
-            </div>
-            <div className="text-center">
-              <div className={`text-3xl font-bold transition-colors duration-300 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>{Math.floor(user.totalStudyTime / 60)}h</div>
-              <div className={`text-sm transition-colors duration-300 ${
-                darkMode ? 'text-gray-400' : 'text-gray-600'
-              }`}>Study Time</div>
-            </div>
-            <div className="text-center">
-              <div className={`text-3xl font-bold transition-colors duration-300 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>Level {user.level}</div>
-              <div className={`text-sm transition-colors duration-300 ${
-                darkMode ? 'text-gray-400' : 'text-gray-600'
-              }`}>{user.xp} XP</div>
-            </div>
-            <div className="text-center">
-              <div className={`text-3xl font-bold transition-colors duration-300 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>{weakAreas.length}</div>
-              <div className={`text-sm transition-colors duration-300 ${
-                darkMode ? 'text-gray-400' : 'text-gray-600'
-              }`}>Focus Areas</div>
-            </div>
           </div>
         </div>
 
@@ -235,18 +192,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center justify-between pt-4 border-t border-opacity-20 border-gray-300">
-                    <button
-                      onClick={(e) => handleQuizClick(e, subject)}
-                      className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        darkMode
-                          ? 'text-gray-300 hover:text-white hover:bg-gray-700'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                      }`}
-                    >
-                      <Play className="w-4 h-4" />
-                      <span>Practice Quiz</span>
-                    </button>
+                  <div className="flex items-center justify-end pt-4 border-t border-opacity-20 border-gray-300">
                     <div className="flex items-center space-x-2">
                       <span className={`text-sm transition-colors duration-300 ${
                         darkMode ? 'text-gray-400' : 'text-gray-600'

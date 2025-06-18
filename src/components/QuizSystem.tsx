@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { QuizQuestion, Subject } from '../types';
-import { ArrowLeft, Clock, CheckCircle, XCircle, Brain, Trophy, Target, Play, RotateCcw } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Brain, Trophy, Target, Play, RotateCcw } from 'lucide-react';
 import { generateQuizQuestions, calculateScore, analyzeQuizResults } from '../utils/quizGenerator';
 
 interface QuizSystemProps {
@@ -77,38 +77,10 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({ selectedSubject, onBack,
   if (quizState === 'setup') {
     return (
       <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        {/* Header */}
-        <header className={`border-b transition-colors duration-300 ${
-          darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        }`}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center h-16">
-              <button
-                onClick={onBack}
-                className={`mr-4 p-2 rounded-lg transition-colors ${
-                  darkMode 
-                    ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
-                  <Target className="w-5 h-5 text-gray-900" />
-                </div>
-                <h1 className={`text-xl font-semibold transition-colors duration-300 ${
-                  darkMode ? 'text-white' : 'text-gray-900'
-                }`}>Practice Quiz</h1>
-              </div>
-            </div>
-          </div>
-        </header>
-
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-12">
-            <div className="w-20 h-20 bg-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Brain className="w-10 h-10 text-gray-900" />
+            <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Brain className="w-10 h-10 text-white" />
             </div>
             <h2 className={`text-3xl font-bold mb-4 transition-colors duration-300 ${
               darkMode ? 'text-white' : 'text-gray-900'
@@ -168,7 +140,7 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({ selectedSubject, onBack,
           <div className="max-w-md mx-auto space-y-4">
             <button
               onClick={() => startQuiz(5)}
-              className="w-full flex items-center justify-center px-6 py-4 bg-yellow-400 text-gray-900 font-semibold rounded-xl hover:bg-yellow-500 transition-colors"
+              className="w-full flex items-center justify-center px-6 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors"
             >
               <Play className="w-5 h-5 mr-2" />
               Start Quick Quiz (5 questions)
@@ -196,8 +168,8 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({ selectedSubject, onBack,
 
     return (
       <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        {/* Header */}
-        <header className={`border-b sticky top-0 z-10 transition-colors duration-300 ${
+        {/* Progress Header */}
+        <div className={`border-b sticky top-0 z-10 transition-colors duration-300 ${
           darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}>
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -223,13 +195,13 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({ selectedSubject, onBack,
                 darkMode ? 'bg-gray-700' : 'bg-gray-200'
               }`}>
                 <div
-                  className="bg-yellow-400 h-1 rounded-full transition-all duration-300"
+                  className="bg-blue-600 h-1 rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
             </div>
           </div>
-        </header>
+        </div>
 
         {/* Question */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -265,7 +237,7 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({ selectedSubject, onBack,
                   onClick={() => handleAnswerSelect(index)}
                   className={`w-full p-4 text-left rounded-xl border-2 transition-all duration-200 ${
                     selectedAnswers[currentQuestionIndex] === index
-                      ? 'border-yellow-400 bg-yellow-50 text-gray-900'
+                      ? 'border-blue-600 bg-blue-50 text-gray-900'
                       : darkMode
                       ? 'border-gray-600 hover:border-gray-500 hover:bg-gray-700 text-gray-100'
                       : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -274,7 +246,7 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({ selectedSubject, onBack,
                   <div className="flex items-center">
                     <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mr-4 ${
                       selectedAnswers[currentQuestionIndex] === index
-                        ? 'bg-yellow-400 text-gray-900'
+                        ? 'bg-blue-600 text-white'
                         : darkMode
                         ? 'bg-gray-600 text-gray-300'
                         : 'bg-gray-200 text-gray-600'
@@ -299,7 +271,7 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({ selectedSubject, onBack,
               <button
                 onClick={handleNextQuestion}
                 disabled={selectedAnswers[currentQuestionIndex] === -1}
-                className="px-8 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {currentQuestionIndex === questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
               </button>
@@ -394,7 +366,7 @@ export const QuizSystem: React.FC<QuizSystemProps> = ({ selectedSubject, onBack,
           </button>
           <button
             onClick={() => startQuiz(questions.length)}
-            className="px-8 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center"
+            className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Retake Quiz

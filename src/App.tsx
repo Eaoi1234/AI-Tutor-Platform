@@ -7,15 +7,11 @@ import { RegisterPage } from './components/auth/RegisterPage';
 import { ProfilePage } from './components/profile/ProfilePage';
 import { SubjectDashboard } from './components/subjects/SubjectDashboard';
 import { StudyDashboard } from './components/analytics/StudyDashboard';
-import { AdminDashboard } from './components/admin/AdminDashboard';
-import { SubjectCatalog } from './components/learning/SubjectCatalog';
-import { DailyQuizzes } from './components/learning/DailyQuizzes';
-import { DiscussionForums } from './components/learning/DiscussionForums';
+
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Subject } from './types';
 import { CoreSubject } from './types/learning';
 import { mockUser, subjects, weakAreas, recentSessions } from './data/mockData';
-import { Sun, Moon, User, LogOut, BookOpen, BarChart3, Settings, MessageSquare, Target, GraduationCap } from 'lucide-react';
 
 type AppState = 'dashboard' | 'chat' | 'quiz' | 'profile' | 'subjects' | 'analytics' | 'admin' | 'catalog' | 'daily-quizzes' | 'forums';
 type AuthState = 'login' | 'register';
@@ -105,201 +101,26 @@ function AppContent() {
     );
   };
 
-  const handleLogout = () => {
-    logout();
-    setCurrentView('dashboard');
-  };
-
-  // Dark Mode Toggle Button (Fixed Position)
-  const DarkModeToggle = () => (
-    <button
-      onClick={toggleDarkMode}
-      className={`fixed top-4 right-4 z-50 p-3 rounded-full shadow-lg transition-all duration-300 ${
-        darkMode 
-          ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
-          : 'bg-white text-gray-700 hover:bg-gray-100'
-      } border ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}
-      aria-label="Toggle dark mode"
-    >
-      {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-    </button>
-  );
-
-  // User Menu (Fixed Position)
-  const UserMenu = () => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    if (!isAuthenticated || !user) return null;
-
-    return (
-      <div className="fixed top-4 left-4 z-50">
-        <div className="relative">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={`flex items-center space-x-2 p-3 rounded-full shadow-lg transition-all duration-300 ${
-              darkMode 
-                ? 'bg-gray-700 text-white hover:bg-gray-600' 
-                : 'bg-white text-gray-700 hover:bg-gray-100'
-            } border ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}
-          >
-            <img 
-              src={user.avatar} 
-              alt={user.firstName}
-              className="w-6 h-6 rounded-full"
-            />
-            <span className="hidden sm:block font-medium">{user.firstName}</span>
-          </button>
-
-          {isOpen && (
-            <div className={`absolute top-full left-0 mt-2 w-48 border rounded-xl shadow-lg transition-colors duration-300 ${
-              darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-            }`}>
-              <div className="p-2">
-                <button
-                  onClick={() => {
-                    setCurrentView('profile');
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
-                    darkMode 
-                      ? 'text-gray-300 hover:bg-gray-700' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <User className="w-4 h-4 mr-3" />
-                  Profile
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentView('catalog');
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
-                    darkMode 
-                      ? 'text-gray-300 hover:bg-gray-700' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <GraduationCap className="w-4 h-4 mr-3" />
-                  Subject Catalog
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentView('daily-quizzes');
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
-                    darkMode 
-                      ? 'text-gray-300 hover:bg-gray-700' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <Target className="w-4 h-4 mr-3" />
-                  Daily Quizzes
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentView('forums');
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
-                    darkMode 
-                      ? 'text-gray-300 hover:bg-gray-700' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <MessageSquare className="w-4 h-4 mr-3" />
-                  Discussion Forums
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentView('subjects');
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
-                    darkMode 
-                      ? 'text-gray-300 hover:bg-gray-700' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <BookOpen className="w-4 h-4 mr-3" />
-                  My Subjects
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentView('analytics');
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
-                    darkMode 
-                      ? 'text-gray-300 hover:bg-gray-700' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4 mr-3" />
-                  Study Analytics
-                </button>
-                {isAdmin && (
-                  <button
-                    onClick={() => {
-                      setCurrentView('admin');
-                      setIsOpen(false);
-                    }}
-                    className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
-                      darkMode 
-                        ? 'text-gray-300 hover:bg-gray-700' 
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <Settings className="w-4 h-4 mr-3" />
-                    Admin Panel
-                  </button>
-                )}
-                <hr className={`my-2 ${darkMode ? 'border-gray-600' : 'border-gray-200'}`} />
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors ${
-                    darkMode 
-                      ? 'text-red-400 hover:bg-gray-700' 
-                      : 'text-red-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <LogOut className="w-4 h-4 mr-3" />
-                  Sign Out
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
   };
 
   // If not authenticated, show auth pages
   if (!isAuthenticated) {
     if (authView === 'register') {
       return (
-        <>
-          <DarkModeToggle />
-          <RegisterPage 
-            onSwitchToLogin={() => setAuthView('login')}
-            darkMode={darkMode}
-          />
-        </>
+        <RegisterPage 
+          onSwitchToLogin={() => setAuthView('login')}
+          darkMode={darkMode}
+          onToggleDarkMode={toggleDarkMode}
+        />
       );
     }
     
     return (
-      <>
-        <DarkModeToggle />
-        <LoginPage 
-          onSwitchToRegister={() => setAuthView('register')}
-          darkMode={darkMode}
-        />
-      </>
+      <LoginPage 
+        onSwitchToRegister={() => setAuthView('register')}
+        darkMode={darkMode}
+        onToggleDarkMode={toggleDarkMode}
+      />
     );
   }
 
@@ -307,36 +128,48 @@ function AppContent() {
   switch (currentView) {
     case 'profile':
       return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
+        <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+          <Navbar 
+            darkMode={darkMode} 
+            onToggleDarkMode={toggleDarkMode}
+            onNavigate={handleNavigation}
+            currentView={currentView}
+          />
           <ProfilePage
             onBack={handleBackToDashboard}
             darkMode={darkMode}
           />
-        </>
+        </div>
       );
     case 'subjects':
       return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
+        <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+          <Navbar 
+            darkMode={darkMode} 
+            onToggleDarkMode={toggleDarkMode}
+            onNavigate={handleNavigation}
+            currentView={currentView}
+          />
           <SubjectDashboard
             onBack={handleBackToDashboard}
             darkMode={darkMode}
           />
-        </>
+        </div>
       );
     case 'analytics':
       return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
+        <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+          <Navbar 
+            darkMode={darkMode} 
+            onToggleDarkMode={toggleDarkMode}
+            onNavigate={handleNavigation}
+            currentView={currentView}
+          />
           <StudyDashboard
             onBack={handleBackToDashboard}
             darkMode={darkMode}
           />
-        </>
+        </div>
       );
     case 'admin':
       return (
@@ -375,34 +208,46 @@ function AppContent() {
       );
     case 'chat':
       return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
+        <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+          <Navbar 
+            darkMode={darkMode} 
+            onToggleDarkMode={toggleDarkMode}
+            onNavigate={handleNavigation}
+            currentView={currentView}
+          />
           <TutorChat
             selectedSubject={selectedSubject}
             onBack={handleBackToDashboard}
             darkMode={darkMode}
           />
-        </>
+        </div>
       );
     case 'quiz':
       return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
+        <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+          <Navbar 
+            darkMode={darkMode} 
+            onToggleDarkMode={toggleDarkMode}
+            onNavigate={handleNavigation}
+            currentView={currentView}
+          />
           <QuizSystem
             selectedSubject={selectedSubject}
             onBack={handleBackToDashboard}
             onQuizComplete={handleQuizComplete}
             darkMode={darkMode}
           />
-        </>
+        </div>
       );
     default:
       return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
+        <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+          <Navbar 
+            darkMode={darkMode} 
+            onToggleDarkMode={toggleDarkMode}
+            onNavigate={handleNavigation}
+            currentView={currentView}
+          />
           <Dashboard
             user={mockUser}
             subjects={subjects}
@@ -415,7 +260,7 @@ function AppContent() {
             bookmarkedSubjects={bookmarkedSubjects}
             onToggleBookmark={toggleBookmark}
           />
-        </>
+        </div>
       );
   }
 }

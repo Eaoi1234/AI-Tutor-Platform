@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage, Subject } from '../types';
-import { Send, ArrowLeft, Brain, Lightbulb, MessageCircle, Sparkles } from 'lucide-react';
+import { Send, Brain, Lightbulb, MessageCircle, Sparkles } from 'lucide-react';
 import { generateAIResponse } from '../utils/aiSimulator';
 
 interface TutorChatProps {
@@ -80,54 +80,37 @@ export const TutorChat: React.FC<TutorChatProps> = ({ selectedSubject, onBack, d
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Header */}
-      <header className={`border-b sticky top-0 z-10 transition-colors duration-300 ${
-        darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-      }`}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={onBack}
-                className={`p-2 rounded-lg transition-colors ${
-                  darkMode 
-                    ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center">
-                  <Brain className="w-6 h-6 text-gray-900" />
-                </div>
-                <div>
-                  <h1 className={`text-lg font-semibold transition-colors duration-300 ${
-                    darkMode ? 'text-white' : 'text-gray-900'
-                  }`}>AI Tutor</h1>
-                  {selectedSubject && (
-                    <p className={`text-sm transition-colors duration-300 ${
-                      darkMode ? 'text-gray-400' : 'text-gray-600'
-                    }`}>{selectedSubject.name}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className={`text-sm transition-colors duration-300 ${
-                darkMode ? 'text-gray-400' : 'text-gray-600'
-              }`}>Online</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Chat Container */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className={`border rounded-xl shadow-sm h-[calc(100vh-200px)] flex flex-col transition-colors duration-300 ${
           darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}>
+          {/* Chat Header */}
+          <div className={`border-b p-6 transition-colors duration-300 ${
+            darkMode ? 'border-gray-700' : 'border-gray-100'
+          }`}>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Brain className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className={`text-lg font-semibold transition-colors duration-300 ${
+                  darkMode ? 'text-white' : 'text-gray-900'
+                }`}>AI Tutor</h1>
+                {selectedSubject && (
+                  <p className={`text-sm transition-colors duration-300 ${
+                    darkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>{selectedSubject.name}</p>
+                )}
+              </div>
+              <div className="ml-auto flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className={`text-sm transition-colors duration-300 ${
+                  darkMode ? 'text-gray-400' : 'text-gray-600'
+                }`}>Online</span>
+              </div>
+            </div>
+          </div>
+
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {messages.map((message) => (
@@ -140,8 +123,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ selectedSubject, onBack, d
                 }`}>
                   {message.type === 'ai' && (
                     <div className="flex items-center mb-2">
-                      <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center mr-2">
-                        <Sparkles className="w-3 h-3 text-gray-900" />
+                      <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center mr-2">
+                        <Sparkles className="w-3 h-3 text-white" />
                       </div>
                       <span className={`text-xs font-medium transition-colors duration-300 ${
                         darkMode ? 'text-gray-400' : 'text-gray-600'
@@ -151,7 +134,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ selectedSubject, onBack, d
                   <div
                     className={`px-4 py-3 rounded-2xl ${
                       message.type === 'user'
-                        ? 'bg-gray-900 text-white'
+                        ? 'bg-blue-600 text-white'
                         : darkMode
                         ? 'bg-gray-700 text-gray-100 border border-gray-600'
                         : 'bg-gray-100 text-gray-900 border border-gray-200'
@@ -172,8 +155,8 @@ export const TutorChat: React.FC<TutorChatProps> = ({ selectedSubject, onBack, d
               <div className="flex justify-start">
                 <div className="max-w-xs lg:max-w-md xl:max-w-lg">
                   <div className="flex items-center mb-2">
-                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center mr-2">
-                      <Sparkles className="w-3 h-3 text-gray-900" />
+                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center mr-2">
+                      <Sparkles className="w-3 h-3 text-white" />
                     </div>
                     <span className={`text-xs font-medium transition-colors duration-300 ${
                       darkMode ? 'text-gray-400' : 'text-gray-600'
@@ -213,9 +196,9 @@ export const TutorChat: React.FC<TutorChatProps> = ({ selectedSubject, onBack, d
                       setInputValue(question);
                       setTimeout(() => handleSendMessage(), 100);
                     }}
-                    className={`px-3 py-2 text-sm border rounded-lg hover:border-yellow-400 hover:bg-yellow-50 transition-colors ${
+                    className={`px-3 py-2 text-sm border rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors ${
                       darkMode 
-                        ? 'bg-gray-800 text-gray-300 border-gray-600 hover:bg-yellow-900 hover:text-yellow-200' 
+                        ? 'bg-gray-800 text-gray-300 border-gray-600 hover:bg-blue-900 hover:text-blue-200' 
                         : 'bg-white text-gray-700 border-gray-200'
                     }`}
                   >
@@ -237,7 +220,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ selectedSubject, onBack, d
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask me anything..."
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent resize-none text-sm transition-colors duration-300 ${
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none text-sm transition-colors duration-300 ${
                     darkMode 
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -249,7 +232,7 @@ export const TutorChat: React.FC<TutorChatProps> = ({ selectedSubject, onBack, d
               <button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim() || isTyping}
-                className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
               >
                 <Send className="w-4 h-4" />
               </button>

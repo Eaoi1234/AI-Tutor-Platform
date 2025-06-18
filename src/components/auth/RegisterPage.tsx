@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Brain, AlertCircle, Check } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Brain, AlertCircle, Check, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { RegisterData } from '../../types/auth';
 
 interface RegisterPageProps {
   onSwitchToLogin: () => void;
   darkMode: boolean;
+  onToggleDarkMode: () => void;
 }
 
-export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, darkMode }) => {
+export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, darkMode, onToggleDarkMode }) => {
   const { register, isLoading, error } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -95,11 +96,24 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
     <div className={`min-h-screen flex transition-colors duration-300 ${
       darkMode ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
+      {/* Dark Mode Toggle */}
+      <button
+        onClick={onToggleDarkMode}
+        className={`fixed top-4 right-4 z-50 p-3 rounded-full shadow-lg transition-all duration-300 ${
+          darkMode 
+            ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
+            : 'bg-white text-gray-700 hover:bg-gray-100'
+        } border ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}
+        aria-label="Toggle dark mode"
+      >
+        {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      </button>
+
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-12 items-center justify-center">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 p-12 items-center justify-center">
         <div className="max-w-md text-center">
           <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-8">
-            <Brain className="w-10 h-10 text-gray-900" />
+            <Brain className="w-10 h-10 text-blue-600" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-6">Join LearnPath</h1>
           <p className="text-xl text-white/90 mb-8">
@@ -126,8 +140,8 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="max-w-md w-full">
           <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 bg-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Brain className="w-8 h-8 text-gray-900" />
+            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Brain className="w-8 h-8 text-white" />
             </div>
             <h1 className={`text-2xl font-bold transition-colors duration-300 ${
               darkMode ? 'text-white' : 'text-gray-900'
@@ -170,7 +184,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
                       required
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-colors duration-300 ${
+                      className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
                         darkMode 
                           ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -194,7 +208,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
                     required
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-colors duration-300 ${
+                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
                       darkMode 
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -222,7 +236,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
                     required
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-colors duration-300 ${
+                    className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
                       darkMode 
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -250,7 +264,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-colors duration-300 ${
+                    className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
                       darkMode 
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -278,7 +292,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
                     required
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-colors duration-300 ${
+                    className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
                       darkMode 
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -335,7 +349,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
                     required
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-colors duration-300 ${
+                    className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
                       darkMode 
                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -363,7 +377,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
                     type="checkbox"
                     checked={formData.agreeToTerms}
                     onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
-                    className={`w-4 h-4 text-yellow-400 border-gray-300 rounded focus:ring-yellow-400 mt-1 ${
+                    className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-400 mt-1 ${
                       validationErrors.agreeToTerms ? 'border-red-500' : ''
                     }`}
                   />
@@ -371,11 +385,11 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
                     darkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>
                     I agree to the{' '}
-                    <a href="#" className="text-yellow-600 hover:text-yellow-700 font-medium">
+                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
                       Terms of Service
                     </a>{' '}
                     and{' '}
-                    <a href="#" className="text-yellow-600 hover:text-yellow-700 font-medium">
+                    <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
                       Privacy Policy
                     </a>
                   </span>
@@ -388,10 +402,10 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-yellow-400 text-gray-900 py-3 px-4 rounded-xl font-semibold hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
               >
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <>
                     Create Account
@@ -408,7 +422,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSwitchToLogin, dar
                 Already have an account?{' '}
                 <button
                   onClick={onSwitchToLogin}
-                  className="text-yellow-600 hover:text-yellow-700 font-medium"
+                  className="text-blue-600 hover:text-blue-700 font-medium"
                 >
                   Sign in
                 </button>

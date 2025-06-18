@@ -5,7 +5,7 @@ import { PersonalAnalytics } from './PersonalAnalytics';
 import { StudyGroups } from './StudyGroups';
 import { 
   Calendar, BarChart3, User, Users, Target, Clock, 
-  TrendingUp, Award, ArrowLeft, Settings
+  TrendingUp, Award, Settings
 } from 'lucide-react';
 
 interface StudyDashboardProps {
@@ -40,43 +40,6 @@ export const StudyDashboard: React.FC<StudyDashboardProps> = ({ onBack, darkMode
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Header */}
-      <header className={`border-b transition-colors duration-300 ${
-        darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={onBack}
-                className={`p-2 rounded-lg transition-colors ${
-                  darkMode 
-                    ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                </div>
-                <h1 className={`text-xl font-semibold transition-colors duration-300 ${
-                  darkMode ? 'text-white' : 'text-gray-900'
-                }`}>Study Analytics</h1>
-              </div>
-            </div>
-            <button className={`p-2 rounded-lg transition-colors ${
-              darkMode 
-                ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
-                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-            }`}>
-              <Settings className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* Navigation Tabs */}
       <div className={`border-b transition-colors duration-300 ${
         darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -91,7 +54,7 @@ export const StudyDashboard: React.FC<StudyDashboardProps> = ({ onBack, darkMode
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center px-1 py-4 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-blue-600 text-blue-600'
                       : darkMode
                       ? 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'

@@ -28,6 +28,11 @@ export const Navbar: React.FC<NavbarProps> = ({
     setIsMenuOpen(false);
   };
 
+  const handleLogoClick = () => {
+    onNavigate('dashboard');
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className={`border-b transition-colors duration-300 ${
       darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -114,15 +119,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
 
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
+            {/* Logo - Now Clickable */}
+            <button 
+              onClick={handleLogoClick}
+              className={`flex items-center space-x-2 p-2 rounded-lg transition-colors hover:bg-opacity-10 hover:bg-blue-600 ${
+                darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              }`}
+            >
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Brain className="w-5 h-5 text-white" />
               </div>
               <span className={`text-xl font-bold transition-colors duration-300 ${
                 darkMode ? 'text-white' : 'text-gray-900'
               }`}>LearnPath</span>
-            </div>
+            </button>
           </div>
 
           {/* Right side - User info */}

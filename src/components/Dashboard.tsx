@@ -113,7 +113,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Learning Paths */}
-        <div className="mb-12">
+        <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className={`text-2xl font-bold transition-colors duration-300 ${
               darkMode ? 'text-white' : 'text-gray-900'
@@ -211,71 +211,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* Focus Areas */}
-        <div>
-          <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
-            darkMode ? 'text-white' : 'text-gray-900'
-          }`}>Areas to Focus On</h2>
-          <div className="space-y-4">
-            {weakAreas.map((area, index) => (
-              <div key={index} className={`border rounded-xl p-6 transition-colors duration-300 ${
-                darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-              }`}>
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className={`font-semibold transition-colors duration-300 ${
-                      darkMode ? 'text-white' : 'text-gray-900'
-                    }`}>{area.topic}</h3>
-                    <p className={`text-sm transition-colors duration-300 ${
-                      darkMode ? 'text-gray-400' : 'text-gray-600'
-                    }`}>{area.subject}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-red-600">{area.accuracy}%</div>
-                    <div className={`text-xs transition-colors duration-300 ${
-                      darkMode ? 'text-gray-500' : 'text-gray-500'
-                    }`}>accuracy</div>
-                  </div>
-                </div>
-                
-                <div className="mb-4">
-                  <div className={`w-full rounded-full h-2 ${
-                    darkMode ? 'bg-gray-700' : 'bg-gray-200'
-                  }`}>
-                    <div
-                      className="h-2 rounded-full bg-red-500"
-                      style={{ width: `${area.accuracy}%` }}
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <p className={`text-sm font-medium transition-colors duration-300 ${
-                    darkMode ? 'text-white' : 'text-gray-900'
-                  }`}>Improvement suggestions:</p>
-                  <ul className="space-y-1">
-                    {area.improvementSuggestions.slice(0, 2).map((suggestion, idx) => (
-                      <li key={idx} className={`text-sm flex items-start transition-colors duration-300 ${
-                        darkMode ? 'text-gray-400' : 'text-gray-600'
-                      }`}>
-                        <span className={`w-1 h-1 rounded-full mt-2 mr-2 flex-shrink-0 ${
-                          darkMode ? 'bg-gray-500' : 'bg-gray-400'
-                        }`}></span>
-                        {suggestion}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <button className="mt-4 text-sm text-yellow-600 hover:text-yellow-700 font-medium flex items-center">
-                  Start practicing
-                  <ArrowRight className="w-3 h-3 ml-1" />
-                </button>
-              </div>
-            ))}
           </div>
         </div>
       </div>

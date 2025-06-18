@@ -33,8 +33,13 @@ export const Navbar: React.FC<NavbarProps> = ({
     setIsMenuOpen(false);
   };
 
+  const handleProfileClick = () => {
+    onNavigate('profile');
+    setIsMenuOpen(false);
+  };
+
   return (
-    <header className={`border-b transition-colors duration-300 ${
+    <header className={`border-b sticky top-0 z-50 transition-colors duration-300 ${
       darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -150,11 +155,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }`}>
                   <span>{Math.floor((user.totalStudyTime || 2840) / 60)}h study time</span>
                 </div>
-                <img 
-                  src={user.avatar} 
-                  alt={user.firstName}
-                  className="w-8 h-8 rounded-full"
-                />
+                <button
+                  onClick={handleProfileClick}
+                  className={`p-1 rounded-full transition-colors hover:ring-2 hover:ring-blue-400 hover:ring-opacity-50 ${
+                    darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                  }`}
+                  title="Go to Profile"
+                >
+                  <img 
+                    src={user.avatar} 
+                    alt={user.firstName}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                </button>
               </>
             )}
           </div>

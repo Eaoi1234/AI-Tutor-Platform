@@ -34,6 +34,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
     onToggleBookmark(subjectId);
   };
 
+  // Function to get current topics for each subject
+  const getCurrentTopics = (subjectName: string): string[] => {
+    const topicMap: Record<string, string[]> = {
+      'Mathematics': ['Derivatives', 'Integration', 'Limits', 'Series'],
+      'Physics': ['Quantum Mechanics', 'Thermodynamics', 'Electromagnetism', 'Optics'],
+      'Chemistry': ['Organic Reactions', 'Molecular Structure', 'Kinetics', 'Equilibrium'],
+      'Biology': ['Cell Biology', 'Genetics', 'Evolution', 'Ecology'],
+      'History': ['Ancient Civilizations', 'Medieval Period', 'Renaissance', 'Modern Era'],
+      'Literature': ['Poetry Analysis', 'Novel Studies', 'Literary Criticism', 'Creative Writing']
+    };
+    return topicMap[subjectName] || ['General Topics'];
+  };
+
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -68,7 +81,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               }`}
             >
               <Target className="w-5 h-5 mr-2" />
-              Take Practice Quiz
+              Daily Practice
             </button>
           </div>
         </div>
@@ -88,6 +101,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {subjects.map((subject) => {
               const progress = (subject.completedTopics / subject.totalTopics) * 100;
               const isBookmarked = bookmarkedSubjects.includes(subject.id);
+              const currentTopics = getCurrentTopics(subject.name);
               
               return (
                 <div
@@ -139,7 +153,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     darkMode ? 'text-gray-400' : 'text-gray-600'
                   }`}>{subject.description}</p>
                   
-                  <div className="space-y-2 mb-4">
+                  {/* Progress and Topics */}
+                  <div className="space-y-3 mb-4">
                     <div className="flex justify-between text-sm">
                       <span className={`transition-colors duration-300 ${
                         darkMode ? 'text-gray-400' : 'text-gray-600'
@@ -155,6 +170,32 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         className={`h-2 rounded-full bg-gradient-to-r ${subject.color} transition-all duration-500`}
                         style={{ width: `${progress}%` }}
                       />
+                    </div>
+                    
+                    {/* Current Topics */}
+                    <div>
+                      <p className={`text-xs font-medium mb-2 transition-colors duration-300 ${
+                        darkMode ? 'text-gray-300' : 'text-gray-700'
+                      }`}>Current Topics:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {currentTopics.slice(0, 3).map((topic, index) => (
+                          <span
+                            key={index}
+                            className={`px-2 py-1 text-xs rounded-full transition-colors duration-300 ${
+                              darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
+                            }`}
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                        {currentTopics.length > 3 && (
+                          <span className={`px-2 py-1 text-xs rounded-full transition-colors duration-300 ${
+                            darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            +{currentTopics.length - 3} more
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 

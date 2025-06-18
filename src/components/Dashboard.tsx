@@ -27,7 +27,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
   bookmarkedSubjects,
   onToggleBookmark
 }) => {
-  const totalProgress = subjects.reduce((acc, subject) => acc + (subject.completedTopics / subject.totalTopics), 0) / subjects.length * 100;
+  // Filter subjects to only show bookmarked ones
+  const bookmarkedSubjectsList = subjects.filter(subject => bookmarkedSubjects.includes(subject.id));
+  
+  const totalProgress = bookmarkedSubjectsList.length > 0 
+    ? bookmarkedSubjectsList.reduce((acc, subject) => acc + (subject.completedTopics / subject.totalTopics), 0) / bookmarkedSubjectsList.length * 100
+    : 0;
 
   const handleBookmarkClick = (e: React.MouseEvent, subjectId: string) => {
     e.stopPropagation();
@@ -97,101 +102,117 @@ export const Dashboard: React.FC<DashboardProps> = ({
             }`}>Learning Paths</h2>
             <span className={`text-sm transition-colors duration-300 ${
               darkMode ? 'text-gray-400' : 'text-gray-600'
-            }`}>{subjects.length} subjects available</span>
+            }`}>{bookmarkedSubjectsList.length} bookmarked subjects</span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {subjects.map((subject) => {
-              const progress = (subject.completedTopics / subject.totalTopics) * 100;
-              const isBookmarked = bookmarkedSubjects.includes(subject.id);
-              const currentTopicName = getCurrentTopicName(subject.name, subject.completedTopics);
-              
-              return (
-                <div
-                  key={subject.id}
-                  onClick={() => onSelectSubject(subject)}
-                  className={`group cursor-pointer border rounded-xl p-6 hover:border-blue-400 hover:shadow-lg transition-all duration-200 ${
-                    darkMode 
-                      ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' 
-                      : 'bg-white border-gray-200'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${subject.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                      <span className="text-white font-bold text-lg">{subject.name.charAt(0)}</span>
+          {bookmarkedSubjectsList.length === 0 ? (
+            <div className="text-center py-12">
+              <BookOpen className={`w-16 h-16 mx-auto mb-4 transition-colors duration-300 ${
+                darkMode ? 'text-gray-600' : 'text-gray-400'
+              }`} />
+              <h3 className={`text-lg font-medium mb-2 transition-colors duration-300 ${
+                darkMode ? 'text-white' : 'text-gray-900'
+              }`}>No Bookmarked Subjects</h3>
+              <p className={`transition-colors duration-300 ${
+                darkMode ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                Bookmark subjects from the available list to see them here in your learning paths
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {bookmarkedSubjectsList.map((subject) => {
+                const progress = (subject.completedTopics / subject.totalTopics) * 100;
+                const isBookmarked = bookmarkedSubjects.includes(subject.id);
+                const currentTopicName = getCurrentTopicName(subject.name, subject.completedTopics);
+                
+                return (
+                  <div
+                    key={subject.id}
+                    onClick={() => onSelectSubject(subject)}
+                    className={`group cursor-pointer border rounded-xl p-6 hover:border-blue-400 hover:shadow-lg transition-all duration-200 ${
+                      darkMode 
+                        ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' 
+                        : 'bg-white border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${subject.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                        <span className="text-white font-bold text-lg">{subject.name.charAt(0)}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={(e) => handleBookmarkClick(e, subject.id)}
+                          className={`p-1.5 rounded-lg transition-colors ${
+                            isBookmarked
+                              ? 'text-blue-600 hover:text-blue-700'
+                              : darkMode
+                              ? 'text-gray-400 hover:text-gray-300'
+                              : 'text-gray-400 hover:text-gray-600'
+                          }`}
+                        >
+                          {isBookmarked ? (
+                            <BookmarkCheck className="w-4 h-4" />
+                          ) : (
+                            <Bookmark className="w-4 h-4" />
+                          )}
+                        </button>
+                        <div className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          subject.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' :
+                          subject.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {subject.difficulty}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={(e) => handleBookmarkClick(e, subject.id)}
-                        className={`p-1.5 rounded-lg transition-colors ${
-                          isBookmarked
-                            ? 'text-blue-600 hover:text-blue-700'
-                            : darkMode
-                            ? 'text-gray-400 hover:text-gray-300'
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
-                      >
-                        {isBookmarked ? (
-                          <BookmarkCheck className="w-4 h-4" />
-                        ) : (
-                          <Bookmark className="w-4 h-4" />
-                        )}
-                      </button>
-                      <div className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        subject.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' :
-                        subject.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                    
+                    <h3 className={`text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors ${
+                      darkMode ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {subject.name}
+                    </h3>
+                    <p className={`text-sm mb-4 transition-colors duration-300 ${
+                      darkMode ? 'text-gray-400' : 'text-gray-600'
+                    }`}>{subject.description}</p>
+                    
+                    <div className="space-y-2 mb-4">
+                      <div className="flex justify-between text-sm">
+                        <span className={`transition-colors duration-300 ${
+                          darkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                          {subject.completedTopics}/{subject.totalTopics} topics: {currentTopicName}
+                        </span>
+                        <span className={`font-medium transition-colors duration-300 ${
+                          darkMode ? 'text-white' : 'text-gray-900'
+                        }`}>{Math.round(progress)}%</span>
+                      </div>
+                      <div className={`w-full rounded-full h-2 ${
+                        darkMode ? 'bg-gray-700' : 'bg-gray-200'
                       }`}>
-                        {subject.difficulty}
+                        <div
+                          className={`h-2 rounded-full bg-gradient-to-r ${subject.color} transition-all duration-500`}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-end pt-4 border-t border-opacity-20 border-gray-300">
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-sm transition-colors duration-300 ${
+                          darkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>Continue</span>
+                        <ArrowRight className={`w-4 h-4 group-hover:text-blue-600 transition-colors ${
+                          darkMode ? 'text-gray-400' : 'text-gray-400'
+                        }`} />
                       </div>
                     </div>
                   </div>
-                  
-                  <h3 className={`text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors ${
-                    darkMode ? 'text-white' : 'text-gray-900'
-                  }`}>
-                    {subject.name}
-                  </h3>
-                  <p className={`text-sm mb-4 transition-colors duration-300 ${
-                    darkMode ? 'text-gray-400' : 'text-gray-600'
-                  }`}>{subject.description}</p>
-                  
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span className={`transition-colors duration-300 ${
-                        darkMode ? 'text-gray-400' : 'text-gray-600'
-                      }`}>
-                        {subject.completedTopics}/{subject.totalTopics} topics: {currentTopicName}
-                      </span>
-                      <span className={`font-medium transition-colors duration-300 ${
-                        darkMode ? 'text-white' : 'text-gray-900'
-                      }`}>{Math.round(progress)}%</span>
-                    </div>
-                    <div className={`w-full rounded-full h-2 ${
-                      darkMode ? 'bg-gray-700' : 'bg-gray-200'
-                    }`}>
-                      <div
-                        className={`h-2 rounded-full bg-gradient-to-r ${subject.color} transition-all duration-500`}
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center justify-end pt-4 border-t border-opacity-20 border-gray-300">
-                    <div className="flex items-center space-x-2">
-                      <span className={`text-sm transition-colors duration-300 ${
-                        darkMode ? 'text-gray-400' : 'text-gray-600'
-                      }`}>Continue</span>
-                      <ArrowRight className={`w-4 h-4 group-hover:text-blue-600 transition-colors ${
-                        darkMode ? 'text-gray-400' : 'text-gray-400'
-                      }`} />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

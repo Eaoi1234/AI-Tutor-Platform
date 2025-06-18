@@ -7,6 +7,7 @@ import { RegisterPage } from './components/auth/RegisterPage';
 import { ProfilePage } from './components/profile/ProfilePage';
 import { SubjectDashboard } from './components/subjects/SubjectDashboard';
 import { StudyDashboard } from './components/analytics/StudyDashboard';
+import { Navbar } from './components/common/Navbar';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Subject } from './types';
@@ -101,6 +102,8 @@ function AppContent() {
     );
   };
 
+  const handleNavigation = (view: AppState) => {
+    setCurrentView(view);
   };
 
   // If not authenticated, show auth pages
@@ -170,41 +173,6 @@ function AppContent() {
             darkMode={darkMode}
           />
         </div>
-      );
-    case 'admin':
-      return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
-          <AdminDashboard darkMode={darkMode} />
-        </>
-      );
-    case 'catalog':
-      return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
-          <SubjectCatalog
-            darkMode={darkMode}
-            onSelectSubject={handleSelectCoreSubject}
-          />
-        </>
-      );
-    case 'daily-quizzes':
-      return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
-          <DailyQuizzes darkMode={darkMode} />
-        </>
-      );
-    case 'forums':
-      return (
-        <>
-          <DarkModeToggle />
-          <UserMenu />
-          <DiscussionForums darkMode={darkMode} />
-        </>
       );
     case 'chat':
       return (

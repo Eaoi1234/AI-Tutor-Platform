@@ -58,40 +58,31 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ onBack, dark
   if (selectedSubject) {
     return (
       <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        {/* Header */}
-        <header className={`border-b transition-colors duration-300 ${
-          darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-        }`}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => setSelectedSubject(null)}
-                  className={`p-2 rounded-lg transition-colors ${
-                    darkMode 
-                      ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
-                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <ChevronRight className="w-5 h-5 rotate-180" />
-                </button>
-                <div>
-                  <h1 className={`text-xl font-semibold transition-colors duration-300 ${
-                    darkMode ? 'text-white' : 'text-gray-900'
-                  }`}>{selectedSubject.name}</h1>
-                  <p className={`text-sm transition-colors duration-300 ${
-                    darkMode ? 'text-gray-400' : 'text-gray-600'
-                  }`}>{selectedSubject.code}</p>
-                </div>
-              </div>
-              <div className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedSubject.enrollmentStatus)}`}>
-                {selectedSubject.enrollmentStatus}
-              </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center space-x-4 mb-8">
+            <button
+              onClick={() => setSelectedSubject(null)}
+              className={`p-2 rounded-lg transition-colors ${
+                darkMode 
+                  ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <ChevronRight className="w-5 h-5 rotate-180" />
+            </button>
+            <div>
+              <h1 className={`text-xl font-semibold transition-colors duration-300 ${
+                darkMode ? 'text-white' : 'text-gray-900'
+              }`}>{selectedSubject.name}</h1>
+              <p className={`text-sm transition-colors duration-300 ${
+                darkMode ? 'text-gray-400' : 'text-gray-600'
+              }`}>{selectedSubject.code}</p>
+            </div>
+            <div className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedSubject.enrollmentStatus)}`}>
+              {selectedSubject.enrollmentStatus}
             </div>
           </div>
-        </header>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
@@ -385,31 +376,6 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ onBack, dark
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Header */}
-      <header className={`border-b transition-colors duration-300 ${
-        darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={onBack}
-                className={`p-2 rounded-lg transition-colors ${
-                  darkMode 
-                    ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <ChevronRight className="w-5 h-5 rotate-180" />
-              </button>
-              <h1 className={`text-xl font-semibold transition-colors duration-300 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>My Subjects</h1>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -422,7 +388,7 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ onBack, dark
               placeholder="Search subjects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-colors duration-300 ${
+              className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
                 darkMode 
                   ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400' 
                   : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -437,7 +403,7 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ onBack, dark
                 onClick={() => setSelectedFilter(filter as any)}
                 className={`px-4 py-3 rounded-xl font-medium capitalize transition-colors ${
                   selectedFilter === filter
-                    ? 'bg-yellow-400 text-gray-900'
+                    ? 'bg-blue-600 text-white'
                     : darkMode
                     ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                     : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
@@ -458,7 +424,7 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ onBack, dark
               <div
                 key={subject.id}
                 onClick={() => setSelectedSubject(subject)}
-                className={`group cursor-pointer border rounded-xl p-6 hover:border-yellow-400 hover:shadow-lg transition-all duration-200 ${
+                className={`group cursor-pointer border rounded-xl p-6 hover:border-blue-400 hover:shadow-lg transition-all duration-200 ${
                   darkMode 
                     ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' 
                     : 'bg-white border-gray-200'
@@ -475,7 +441,7 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ onBack, dark
                   </div>
                 </div>
                 
-                <h3 className={`text-lg font-semibold mb-1 group-hover:text-yellow-600 transition-colors ${
+                <h3 className={`text-lg font-semibold mb-1 group-hover:text-blue-600 transition-colors ${
                   darkMode ? 'text-white' : 'text-gray-900'
                 }`}>
                   {subject.name}
@@ -535,7 +501,7 @@ export const SubjectDashboard: React.FC<SubjectDashboardProps> = ({ onBack, dark
                       {subject.grades.current}
                     </span>
                   </div>
-                  <ChevronRight className={`w-4 h-4 group-hover:text-yellow-500 transition-colors ${
+                  <ChevronRight className={`w-4 h-4 group-hover:text-blue-600 transition-colors ${
                     darkMode ? 'text-gray-400' : 'text-gray-400'
                   }`} />
                 </div>

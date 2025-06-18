@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, Subject, WeakArea, LearningSession } from '../types';
-import { BarChart3, Brain, Clock, TrendingUp, Award, Zap, Calendar, Target, ArrowRight, BookOpen, Users, Star, Play, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Brain, Target, ArrowRight, BookOpen, Bookmark, BookmarkCheck } from 'lucide-react';
 
 interface DashboardProps {
   user: User;
@@ -36,52 +36,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      {/* Header */}
-      <header className={`border-b transition-colors duration-300 ${
-        darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
-                  <Brain className="w-5 h-5 text-gray-900" />
-                </div>
-                <span className={`text-xl font-bold transition-colors duration-300 ${
-                  darkMode ? 'text-white' : 'text-gray-900'
-                }`}>LearnPath</span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-6">
-              <div className={`flex items-center space-x-2 text-sm transition-colors duration-300 ${
-                darkMode ? 'text-gray-300' : 'text-gray-600'
-              }`}>
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span>{user.currentStreak} day streak</span>
-              </div>
-              <div className={`flex items-center space-x-2 text-sm transition-colors duration-300 ${
-                darkMode ? 'text-gray-300' : 'text-gray-600'
-              }`}>
-                <Clock className="w-4 h-4" />
-                <span>{Math.floor(user.totalStudyTime / 60)}h study time</span>
-              </div>
-              <img 
-                src={user.avatar} 
-                alt={user.name}
-                className="w-8 h-8 rounded-full"
-              />
-            </div>
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className={`text-4xl md:text-5xl font-bold mb-4 transition-colors duration-300 ${
             darkMode ? 'text-white' : 'text-gray-900'
           }`}>
-            Welcome back, <span className="text-yellow-500">{user.name}</span>
+            Welcome back, <span className="text-blue-600">{user.name}</span>
           </h1>
           <p className={`text-xl mb-8 max-w-2xl mx-auto transition-colors duration-300 ${
             darkMode ? 'text-gray-300' : 'text-gray-600'
@@ -93,7 +54,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <button
               onClick={onStartChat}
-              className="inline-flex items-center px-6 py-3 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-500 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Brain className="w-5 h-5 mr-2" />
               Start AI Tutoring
@@ -132,7 +93,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <div
                   key={subject.id}
                   onClick={() => onSelectSubject(subject)}
-                  className={`group cursor-pointer border rounded-xl p-6 hover:border-yellow-400 hover:shadow-lg transition-all duration-200 ${
+                  className={`group cursor-pointer border rounded-xl p-6 hover:border-blue-400 hover:shadow-lg transition-all duration-200 ${
                     darkMode 
                       ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' 
                       : 'bg-white border-gray-200'
@@ -147,7 +108,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         onClick={(e) => handleBookmarkClick(e, subject.id)}
                         className={`p-1.5 rounded-lg transition-colors ${
                           isBookmarked
-                            ? 'text-yellow-500 hover:text-yellow-600'
+                            ? 'text-blue-600 hover:text-blue-700'
                             : darkMode
                             ? 'text-gray-400 hover:text-gray-300'
                             : 'text-gray-400 hover:text-gray-600'
@@ -169,7 +130,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                   </div>
                   
-                  <h3 className={`text-lg font-semibold mb-2 group-hover:text-yellow-600 transition-colors ${
+                  <h3 className={`text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors ${
                     darkMode ? 'text-white' : 'text-gray-900'
                   }`}>
                     {subject.name}
@@ -203,7 +164,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       <span className={`text-sm transition-colors duration-300 ${
                         darkMode ? 'text-gray-400' : 'text-gray-600'
                       }`}>Continue</span>
-                      <ArrowRight className={`w-4 h-4 group-hover:text-yellow-500 transition-colors ${
+                      <ArrowRight className={`w-4 h-4 group-hover:text-blue-600 transition-colors ${
                         darkMode ? 'text-gray-400' : 'text-gray-400'
                       }`} />
                     </div>

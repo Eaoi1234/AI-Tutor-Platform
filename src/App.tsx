@@ -106,6 +106,26 @@ function AppContent() {
     setCurrentView(view);
   };
 
+  const DarkModeToggle = () => (
+    <button
+      onClick={toggleDarkMode}
+      className="fixed top-4 right-20 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg"
+    >
+      {darkMode ? '☀️' : '🌙'}
+    </button>
+  );
+
+  const UserMenu = () => (
+    <div className="fixed top-4 right-4 z-50">
+      <button
+        onClick={logout}
+        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+      >
+        Logout
+      </button>
+    </div>
+  );
+
   // If not authenticated, show auth pages
   if (!isAuthenticated) {
     if (authView === 'register') {

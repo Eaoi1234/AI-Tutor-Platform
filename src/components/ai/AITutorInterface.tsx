@@ -1,12 +1,16 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Brain, BookOpen, Star, Users, Zap, Plus, 
   ChevronDown, ChevronRight, Sparkles, Play, CheckCircle,
-  Clock, Award, Target, Upload, FileText, X, AlertCircle, Search
+  Clock, Award, Target, Upload, FileText, X, AlertCircle, Search,
+  MessageSquare, Settings, Lightbulb
 } from 'lucide-react';
 import { subjects } from '../../data/mockData';
 import { Subject } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
+import { EnhancedAITutor } from './EnhancedAITutor';
+import { CourseGenerator } from './CourseGenerator';
+import { GeneratedCourse } from '../../utils/openai';
 
 interface AITutorInterfaceProps {
   darkMode: boolean;
@@ -79,6 +83,8 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [currentView, setCurrentView] = useState<'main' | 'chat' | 'generator'>('main');
+  const [generatedCourses, setGeneratedCourses] = useState<GeneratedCourse[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Get user's enrolled subjects - filter subjects based on user's academic info
@@ -241,7 +247,7 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
 
   const handleGenerateCourse = () => {
     if (selectedTopic.trim()) {
-      onStartChat();
+      setCurrentView('generator');
     }
   };
 
@@ -249,6 +255,11 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
     if (onNavigateToDashboard) {
       onNavigateToDashboard();
     }
+  };
+
+  const handleCourseGenerated = (course: GeneratedCourse) => {
+    setGeneratedCourses(prev => [...prev, course]);
+    setCurrentView('main');
   };
 
   const toggleCourse = (courseId: string) => {
@@ -368,6 +379,26 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
     return '📄';
   };
 
+  // Show Enhanced AI Tutor
+  if (currentView === 'chat') {
+    return (
+      <EnhancedAITutor 
+        darkMode={darkMode}
+        onBack={() => setCurrentView('main')}
+      />
+    );
+  }
+
+  // Show Course Generator
+  if (currentView === 'generator') {
+    return (
+      <CourseGenerator 
+        darkMode={darkMode}
+        onCourseGenerated={handleCourseGenerated}
+      />
+    );
+  }
+
   return (
     <div className={`min-h-screen transition-colors duration-300 ${
       darkMode ? 'bg-gray-900' : 'bg-gray-50'
@@ -402,16 +433,28 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
             <p className={`text-sm mb-6 transition-colors duration-300 ${
               darkMode ? 'text-gray-400' : 'text-gray-600'
             }`}>
-              Your personalized learning companion for any topic
+              Your personalized learning companion powered by advanced AI
             </p>
 
             {/* Navigation */}
             <nav className="space-y-2 mb-8">
-              <button className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                darkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'
-              }`}>
-                <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">New Course</span>
+              <button 
+                onClick={() => setCurrentView('chat')}
+                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                  darkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span className="text-sm font-medium">Chat with AI</span>
+              </button>
+              <button 
+                onClick={() => setCurrentView('generator')}
+                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                  darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="text-sm font-medium">Generate Course</span>
               </button>
             </nav>
 
@@ -508,6 +551,35 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
                 className="fixed inset-0 z-40" 
                 onClick={() => setShowSearchResults(false)}
               />
+            )}
+
+            {/* Generated Courses */}
+            {generatedCourses.length > 0 && (
+              <div className="mb-8">
+                <h3 className={`text-sm font-semibold mb-4 transition-colors duration-300 ${
+                  darkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>Generated Courses</h3>
+                
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {generatedCourses.map((course) => (
+                    <div key={course.id} className={`flex items-center justify-between p-2 rounded-lg border transition-colors ${
+                      darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+                    }`}>
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <Sparkles className="w-4 h-4 text-purple-500" />
+                        <div className="min-w-0 flex-1">
+                          <p className={`text-xs font-medium truncate transition-colors duration-300 ${
+                            darkMode ? 'text-white' : 'text-gray-900'
+                          }`}>{course.title}</p>
+                          <p className={`text-xs transition-colors duration-300 ${
+                            darkMode ? 'text-gray-400' : 'text-gray-600'
+                          }`}>{course.estimatedHours}h • {course.difficulty}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Uploaded Documents */}
@@ -744,18 +816,59 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
                 <p className={`text-lg transition-colors duration-300 ${
                   darkMode ? 'text-gray-400' : 'text-gray-600'
                 }`}>
-                  Enter a topic below to generate a personalized course for it
+                  Choose how you'd like to learn with our AI-powered tools
                 </p>
               </div>
 
-              {/* Input Section */}
+              {/* Action Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <button
+                  onClick={() => setCurrentView('chat')}
+                  className={`p-6 border rounded-xl text-left transition-all duration-200 hover:border-blue-400 hover:shadow-lg ${
+                    darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                  }`}
+                >
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                    <MessageSquare className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>Chat with AI Tutor</h3>
+                  <p className={`text-sm transition-colors duration-300 ${
+                    darkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
+                    Get instant help with questions, explanations, and personalized guidance
+                  </p>
+                </button>
+
+                <button
+                  onClick={() => setCurrentView('generator')}
+                  className={`p-6 border rounded-xl text-left transition-all duration-200 hover:border-purple-400 hover:shadow-lg ${
+                    darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                  }`}
+                >
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+                    <Sparkles className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <h3 className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>Generate Course</h3>
+                  <p className={`text-sm transition-colors duration-300 ${
+                    darkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
+                    Create custom courses tailored to your learning goals and pace
+                  </p>
+                </button>
+              </div>
+
+              {/* Quick Input */}
               <div className={`border rounded-2xl p-6 transition-colors duration-300 ${
                 darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
               }`}>
                 <textarea
                   value={selectedTopic}
                   onChange={(e) => setSelectedTopic(e.target.value)}
-                  placeholder="e.g. JavaScript Promises, React Hooks, Go Routines etc"
+                  placeholder="e.g. JavaScript Promises, React Hooks, Calculus, Spanish Grammar..."
                   className={`w-full h-24 resize-none border-0 outline-none text-lg transition-colors duration-300 ${
                     darkMode 
                       ? 'bg-transparent text-white placeholder-gray-400' 
@@ -790,16 +903,16 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
                       }`}
                     >
                       <Upload className="w-4 h-4" />
-                      <span className="text-sm">Upload Your Own Doc</span>
+                      <span className="text-sm">Upload Doc</span>
                     </button>
                     
                     <button
-                      onClick={handleGenerateCourse}
+                      onClick={() => setCurrentView('chat')}
                       disabled={!selectedTopic.trim()}
-                      className="flex items-center space-x-2 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
                     >
-                      <Sparkles className="w-4 h-4" />
-                      <span>Generate Course</span>
+                      <MessageSquare className="w-4 h-4" />
+                      <span>Ask AI</span>
                     </button>
                   </div>
                 </div>

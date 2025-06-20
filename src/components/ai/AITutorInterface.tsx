@@ -3,14 +3,12 @@ import {
   Brain, BookOpen, Star, Users, Zap, Plus, 
   ChevronDown, ChevronRight, Sparkles, Play, CheckCircle,
   Clock, Award, Target, Upload, FileText, X, AlertCircle, Search,
-  MessageSquare, Settings, Lightbulb
+  MessageSquare, Settings, Lightbulb, Loader2
 } from 'lucide-react';
 import { subjects } from '../../data/mockData';
 import { Subject } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
-import { EnhancedAITutor } from './EnhancedAITutor';
-import { CourseGenerator } from './CourseGenerator';
-import { GeneratedCourse } from '../../utils/openai';
+import { openAIService, GeneratedCourse } from '../../utils/openai';
 
 interface AITutorInterfaceProps {
   darkMode: boolean;
@@ -18,6 +16,24 @@ interface AITutorInterfaceProps {
   onNavigateToSubjects?: () => void;
   onNavigateToDashboard?: () => void;
   onNavigateToStudy?: (subject: Subject, moduleId?: string, lessonId?: string) => void;
+}
+
+interface UploadedDocument {
+  id: string;
+  name: string;
+  size: string;
+  type: string;
+  uploadDate: Date;
+}
+
+interface SearchResult {
+  type: 'course' | 'module' | 'lesson';
+  id: string;
+  name: string;
+  courseName: string;
+  moduleId?: string;
+  lessonId?: string;
+  subject: Subject;
 }
 
 interface CourseTreeItem {
@@ -48,24 +64,6 @@ interface LessonItem {
   isLocked: boolean;
 }
 
-interface UploadedDocument {
-  id: string;
-  name: string;
-  size: string;
-  type: string;
-  uploadDate: Date;
-}
-
-interface SearchResult {
-  type: 'course' | 'module' | 'lesson';
-  id: string;
-  name: string;
-  courseName: string;
-  moduleId?: string;
-  lessonId?: string;
-  subject: Subject;
-}
-
 export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({ 
   darkMode, 
   onStartChat, 
@@ -83,8 +81,16 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [currentView, setCurrentView] = useState<'main' | 'chat' | 'generator'>('main');
+  const [showCourseGenerator, setShowCourseGenerator] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCourses, setGeneratedCourses] = useState<GeneratedCourse[]>([]);
+  const [courseFormData, setCourseFormData] = useState({
+    subject: '',
+    level: 'beginner' as 'beginner' | 'intermediate' | 'advanced',
+    duration: 20,
+    specificTopics: '',
+    learningGoals: ''
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Get user's enrolled subjects - filter subjects based on user's academic info
@@ -245,9 +251,35 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
     setSearchTerm('');
   };
 
-  const handleGenerateCourse = () => {
-    if (selectedTopic.trim()) {
-      setCurrentView('generator');
+  const handleGenerateCourse = async () => {
+    if (!courseFormData.subject.trim()) return;
+
+    setIsGenerating(true);
+    try {
+      const topics = courseFormData.specificTopics 
+        ? courseFormData.specificTopics.split(',').map(t => t.trim()).filter(t => t)
+        : undefined;
+
+      const course = await openAIService.generateCourse(
+        courseFormData.subject,
+        courseFormData.level,
+        courseFormData.duration,
+        topics
+      );
+
+      setGeneratedCourses(prev => [...prev, course]);
+      setShowCourseGenerator(false);
+      setCourseFormData({
+        subject: '',
+        level: 'beginner',
+        duration: 20,
+        specificTopics: '',
+        learningGoals: ''
+      });
+    } catch (error) {
+      console.error('Error generating course:', error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -255,11 +287,6 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
     if (onNavigateToDashboard) {
       onNavigateToDashboard();
     }
-  };
-
-  const handleCourseGenerated = (course: GeneratedCourse) => {
-    setGeneratedCourses(prev => [...prev, course]);
-    setCurrentView('main');
   };
 
   const toggleCourse = (courseId: string) => {
@@ -379,23 +406,156 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
     return '📄';
   };
 
-  // Show Enhanced AI Tutor
-  if (currentView === 'chat') {
+  // Course Generator Modal
+  if (showCourseGenerator) {
     return (
-      <EnhancedAITutor 
-        darkMode={darkMode}
-        onBack={() => setCurrentView('main')}
-      />
-    );
-  }
+      <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className="max-w-2xl mx-auto p-6">
+          <div className={`border rounded-xl p-8 transition-colors duration-300 ${
+            darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+          }`}>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className={`text-2xl font-bold transition-colors duration-300 ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>Generate Course</h1>
+                  <p className={`transition-colors duration-300 ${
+                    darkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Create personalized courses with AI</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowCourseGenerator(false)}
+                className={`p-2 rounded-lg transition-colors ${
+                  darkMode 
+                    ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-  // Show Course Generator
-  if (currentView === 'generator') {
-    return (
-      <CourseGenerator 
-        darkMode={darkMode}
-        onCourseGenerated={handleCourseGenerated}
-      />
+            {/* Form */}
+            <div className="space-y-6">
+              <div>
+                <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                  darkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  Subject *
+                </label>
+                <input
+                  type="text"
+                  value={courseFormData.subject}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, subject: e.target.value })}
+                  placeholder="e.g., JavaScript, Calculus, Spanish, etc."
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                  darkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  Difficulty Level
+                </label>
+                <select
+                  value={courseFormData.level}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, level: e.target.value as any })}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                >
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                  darkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  Course Duration (hours)
+                </label>
+                <input
+                  type="number"
+                  value={courseFormData.duration}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, duration: parseInt(e.target.value) || 20 })}
+                  min="5"
+                  max="100"
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                  darkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  Specific Topics (optional)
+                </label>
+                <input
+                  type="text"
+                  value={courseFormData.specificTopics}
+                  onChange={(e) => setCourseFormData({ ...courseFormData, specificTopics: e.target.value })}
+                  placeholder="e.g., functions, loops, variables (comma-separated)"
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                />
+              </div>
+
+              <button
+                onClick={handleGenerateCourse}
+                disabled={!courseFormData.subject.trim() || isGenerating}
+                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center shadow-lg"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Generating Course...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Generate Course
+                  </>
+                )}
+              </button>
+
+              {/* API Key Notice */}
+              {!import.meta.env.VITE_OPENAI_API_KEY && (
+                <div className={`p-4 rounded-lg border transition-colors duration-300 ${
+                  darkMode ? 'bg-yellow-900 border-yellow-700' : 'bg-yellow-50 border-yellow-200'
+                }`}>
+                  <p className={`text-sm transition-colors duration-300 ${
+                    darkMode ? 'text-yellow-300' : 'text-yellow-800'
+                  }`}>
+                    💡 Add your OpenAI API key to .env file as VITE_OPENAI_API_KEY for AI-powered course generation
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -439,7 +599,7 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
             {/* Navigation */}
             <nav className="space-y-2 mb-8">
               <button 
-                onClick={() => setCurrentView('chat')}
+                onClick={onStartChat}
                 className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
                   darkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'
                 }`}
@@ -448,7 +608,7 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
                 <span className="text-sm font-medium">Chat with AI</span>
               </button>
               <button 
-                onClick={() => setCurrentView('generator')}
+                onClick={() => setShowCourseGenerator(true)}
                 className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
                   darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
                 }`}
@@ -823,7 +983,7 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
               {/* Action Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <button
-                  onClick={() => setCurrentView('chat')}
+                  onClick={onStartChat}
                   className={`p-6 border rounded-xl text-left transition-all duration-200 hover:border-blue-400 hover:shadow-lg ${
                     darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                   }`}
@@ -842,7 +1002,7 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
                 </button>
 
                 <button
-                  onClick={() => setCurrentView('generator')}
+                  onClick={() => setShowCourseGenerator(true)}
                   className={`p-6 border rounded-xl text-left transition-all duration-200 hover:border-purple-400 hover:shadow-lg ${
                     darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
                   }`}
@@ -907,7 +1067,7 @@ export const AITutorInterface: React.FC<AITutorInterfaceProps> = ({
                     </button>
                     
                     <button
-                      onClick={() => setCurrentView('chat')}
+                      onClick={onStartChat}
                       disabled={!selectedTopic.trim()}
                       className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
                     >

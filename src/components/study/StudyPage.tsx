@@ -3,9 +3,10 @@ import {
   ArrowLeft, BookOpen, Clock, CheckCircle, Lock, Play, Pause,
   MessageSquare, Send, X, ChevronDown, ChevronUp, Volume2,
   Settings, Bookmark, Share2, Download, RotateCcw, AlertCircle,
-  Brain, Lightbulb, HelpCircle, Zap
+  Brain, Lightbulb, HelpCircle, Zap, Loader2, Sparkles
 } from 'lucide-react';
 import { Subject } from '../../types';
+import { openAIService } from '../../utils/openai';
 
 interface StudyPageProps {
   subject: Subject;
@@ -38,6 +39,7 @@ interface ChatMessage {
   type: 'user' | 'ai';
   content: string;
   timestamp: Date;
+  isLoading?: boolean;
 }
 
 export const StudyPage: React.FC<StudyPageProps> = ({ 
@@ -109,23 +111,19 @@ export const StudyPage: React.FC<StudyPageProps> = ({
   });
 
   const [showAIChat, setShowAIChat] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      type: 'ai',
-      content: 'Hey, I am your AI instructor. How can I help you today? 🤖',
-      timestamp: new Date()
-    }
-  ]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const suggestedQuestions = [
-    "What are the main differences between Angular and other front-end frameworks like React or Vue.js?",
-    "How does Angular's component-based architecture improve code maintainability?",
-    "What are some potential drawbacks of using Angular for small or simple projects?",
-    "How does TypeScript contribute to the development process in Angular?"
+    "Can you explain this concept in simpler terms?",
+    "What are some real-world examples of this?",
+    "How does this relate to what I learned before?",
+    "Can you give me practice problems?",
+    "What should I focus on to master this topic?",
+    "How can I apply this knowledge practically?"
   ];
 
   useEffect(() => {
@@ -149,6 +147,26 @@ export const StudyPage: React.FC<StudyPageProps> = ({
     }
   }, [moduleId, lessonId]);
 
+  const initializeChat = () => {
+    const welcomeMessage: ChatMessage = {
+      id: '1',
+      type: 'ai',
+      content: `Hi! I'm your AI study assistant for ${subject.name}. I'm here to help you understand the current lesson: "${currentLesson.title}".
+
+I can help you with:
+• Explaining difficult concepts
+• Providing additional examples
+• Creating practice questions
+• Connecting ideas to real-world applications
+• Clarifying any doubts you have
+
+What would you like to know about this topic?`,
+      timestamp: new Date()
+    };
+    setChatMessages([welcomeMessage]);
+    setIsInitialized(true);
+  };
+
   const toggleModule = (moduleId: string) => {
     setModules(prev => prev.map(module => 
       module.id === moduleId 
@@ -160,6 +178,9 @@ export const StudyPage: React.FC<StudyPageProps> = ({
   const selectLesson = (lesson: Lesson) => {
     if (!lesson.isLocked) {
       setCurrentLesson(lesson);
+      // Reset chat when switching lessons
+      setIsInitialized(false);
+      setChatMessages([]);
     }
   };
 
@@ -188,7 +209,7 @@ export const StudyPage: React.FC<StudyPageProps> = ({
   };
 
   const sendMessage = async () => {
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() || isTyping) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -201,17 +222,57 @@ export const StudyPage: React.FC<StudyPageProps> = ({
     setChatInput('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        type: 'ai',
-        content: "That's a great question! Let me explain this concept in detail. Angular is designed to be a comprehensive framework that provides everything you need to build large-scale applications. The component-based architecture allows for better code organization and reusability.",
-        timestamp: new Date()
-      };
-      setChatMessages(prev => [...prev, aiMessage]);
+    // Add loading message
+    const loadingMessage: ChatMessage = {
+      id: (Date.now() + 1).toString(),
+      type: 'ai',
+      content: '',
+      timestamp: new Date(),
+      isLoading: true
+    };
+    setChatMessages(prev => [...prev, loadingMessage]);
+
+    try {
+      // Create context about the current lesson
+      const lessonContext = `Current lesson: "${currentLesson.title}" in ${subject.name}. This is a ${currentLesson.type} lesson that takes about ${currentLesson.duration} minutes.`;
+      
+      const response = await openAIService.generateTutorResponse(
+        chatInput, 
+        subject.name,
+        [lessonContext, ...chatMessages.slice(-4).map(m => m.content)] // Include lesson context and last 4 messages
+      );
+      
+      // Remove loading message and add actual response
+      setChatMessages(prev => {
+        const filtered = prev.filter(m => !m.isLoading);
+        return [...filtered, {
+          id: (Date.now() + 2).toString(),
+          type: 'ai',
+          content: response,
+          timestamp: new Date()
+        }];
+      });
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      setChatMessages(prev => {
+        const filtered = prev.filter(m => !m.isLoading);
+        return [...filtered, {
+          id: (Date.now() + 2).toString(),
+          type: 'ai',
+          content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+          timestamp: new Date()
+        }];
+      });
+    } finally {
       setIsTyping(false);
-    }, 2000);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   const getTypeIcon = (type: string) => {
@@ -501,7 +562,7 @@ export const StudyPage: React.FC<StudyPageProps> = ({
         </div>
       </div>
 
-      {/* AI Instructor Chat */}
+      {/* AI Study Assistant Chat */}
       {showAIChat && (
         <div className="fixed bottom-4 right-4 w-96 h-96 z-50">
           <div className={`border rounded-xl shadow-lg h-full flex flex-col transition-colors duration-300 ${
@@ -512,18 +573,18 @@ export const StudyPage: React.FC<StudyPageProps> = ({
               darkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
                   <Brain className="w-4 h-4 text-white" />
                 </div>
                 <div>
                   <h3 className={`font-semibold transition-colors duration-300 ${
                     darkMode ? 'text-white' : 'text-gray-900'
-                  }`}>AI Instructor</h3>
+                  }`}>AI Study Assistant</h3>
                   <div className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     <span className={`text-xs transition-colors duration-300 ${
                       darkMode ? 'text-gray-400' : 'text-gray-600'
-                    }`}>Online</span>
+                    }`}>Ready to help</span>
                   </div>
                 </div>
               </div>
@@ -556,42 +617,38 @@ export const StudyPage: React.FC<StudyPageProps> = ({
                           : 'bg-gray-100 text-gray-900'
                       }`}
                     >
-                      {message.content}
+                      {message.isLoading ? (
+                        <div className="flex items-center space-x-2">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          <span>Thinking...</span>
+                        </div>
+                      ) : (
+                        message.content
+                      )}
                     </div>
                   </div>
                 </div>
               ))}
-              
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className={`px-3 py-2 rounded-lg ${
-                    darkMode ? 'bg-gray-700' : 'bg-gray-100'
-                  }`}>
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
               <div ref={chatEndRef} />
             </div>
 
             {/* Suggested Questions */}
-            {chatMessages.length === 1 && (
+            {chatMessages.length === 0 && (
               <div className={`px-4 py-2 border-t transition-colors duration-300 ${
                 darkMode ? 'border-gray-700 bg-gray-750' : 'border-gray-100 bg-gray-50'
               }`}>
                 <p className={`text-xs mb-2 transition-colors duration-300 ${
                   darkMode ? 'text-gray-400' : 'text-gray-600'
-                }`}>Some questions you might have about this lesson:</p>
+                }`}>Quick questions about this lesson:</p>
                 <div className="space-y-1">
                   {suggestedQuestions.slice(0, 2).map((question, index) => (
                     <button
                       key={index}
                       onClick={() => {
                         setChatInput(question);
+                        if (!isInitialized) {
+                          initializeChat();
+                        }
                         setTimeout(() => sendMessage(), 100);
                       }}
                       className={`w-full text-left text-xs p-2 rounded border transition-colors ${
@@ -600,7 +657,7 @@ export const StudyPage: React.FC<StudyPageProps> = ({
                           : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                       }`}
                     >
-                      {question.length > 60 ? question.substring(0, 60) + '...' : question}
+                      {question.length > 50 ? question.substring(0, 50) + '...' : question}
                     </button>
                   ))}
                 </div>
@@ -616,20 +673,30 @@ export const StudyPage: React.FC<StudyPageProps> = ({
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Ask a question..."
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask about this lesson..."
                   className={`flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-colors duration-300 ${
                     darkMode 
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                   }`}
+                  disabled={isTyping}
                 />
                 <button
-                  onClick={sendMessage}
+                  onClick={() => {
+                    if (!isInitialized) {
+                      initializeChat();
+                    }
+                    sendMessage();
+                  }}
                   disabled={!chatInput.trim() || isTyping}
-                  className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="px-3 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-colors"
                 >
-                  <Send className="w-4 h-4" />
+                  {isTyping ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -637,11 +704,16 @@ export const StudyPage: React.FC<StudyPageProps> = ({
         </div>
       )}
 
-      {/* Floating AI Instructor Button */}
+      {/* Floating AI Assistant Button */}
       {!showAIChat && (
         <button
-          onClick={() => setShowAIChat(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 flex items-center justify-center z-40 hover:scale-110"
+          onClick={() => {
+            setShowAIChat(true);
+            if (!isInitialized) {
+              initializeChat();
+            }
+          }}
+          className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 flex items-center justify-center z-40 hover:scale-110"
         >
           <Brain className="w-6 h-6" />
         </button>

@@ -1,5 +1,20 @@
+import { openAIService } from './openai';
+
 export const generateAIResponse = async (message: string, subject?: string): Promise<string> => {
-  // Simulate AI thinking time
+  // Check if OpenAI API key is available
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  
+  if (apiKey && apiKey !== 'your_openai_api_key_here') {
+    try {
+      // Use real OpenAI API
+      return await openAIService.generateTutorResponse(message, subject);
+    } catch (error) {
+      console.error('OpenAI API failed, falling back to mock responses:', error);
+      // Fall back to mock responses if API fails
+    }
+  }
+
+  // Fallback to mock responses for demo purposes
   await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
 
   const responses = {

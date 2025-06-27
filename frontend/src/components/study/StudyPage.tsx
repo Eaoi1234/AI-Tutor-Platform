@@ -25,7 +25,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Subject } from "../../types";
-import { fetchChapter } from "../../api";
+import { fetchChapters, fetchChapter } from "../../api";
 
 interface StudyPageProps {
   subject: Subject;
@@ -67,158 +67,8 @@ export const StudyPage: React.FC<StudyPageProps> = ({
   moduleId,
   lessonId,
 }) => {
-  const [modules, setModules] = useState<Module[]>([
-    {
-      id: "1",
-      title: "Introduction to Angular",
-      isCompleted: true,
-      isExpanded: true,
-      lessons: [
-        {
-          id: "1",
-          title: "What is Angular and Why Use It?",
-          type: "text",
-          duration: 15,
-          isCompleted: true,
-          isLocked: false,
-        },
-        {
-          id: "2",
-          title: "Setting Up Your Development Environment",
-          type: "text",
-          duration: 20,
-          isCompleted: true,
-          isLocked: false,
-        },
-        {
-          id: "3",
-          title: "Understanding Angular CLI",
-          type: "video",
-          duration: 25,
-          isCompleted: true,
-          isLocked: false,
-        },
-        {
-          id: "4",
-          title: "Creating Your First Angular Project",
-          type: "assignment",
-          duration: 30,
-          isCompleted: true,
-          isLocked: false,
-        },
-        {
-          id: "5",
-          title: "Project Structure Overview",
-          type: "text",
-          duration: 15,
-          isCompleted: true,
-          isLocked: false,
-        },
-        {
-          id: "6",
-          title: "Running and Testing Your Application",
-          type: "video",
-          duration: 20,
-          isCompleted: true,
-          isLocked: false,
-        },
-      ],
-    },
-    {
-      id: "2",
-      title: "Components and Templates",
-      isCompleted: false,
-      isExpanded: false,
-      lessons: [
-        {
-          id: "7",
-          title: "Understanding Angular Components",
-          type: "video",
-          duration: 25,
-          isCompleted: false,
-          isLocked: false,
-        },
-        {
-          id: "8",
-          title: "Creating and Using Components",
-          type: "assignment",
-          duration: 35,
-          isCompleted: false,
-          isLocked: false,
-        },
-        {
-          id: "9",
-          title: "Template Syntax and Data Binding",
-          type: "text",
-          duration: 30,
-          isCompleted: false,
-          isLocked: false,
-        },
-        {
-          id: "10",
-          title: "Event Handling",
-          type: "video",
-          duration: 20,
-          isCompleted: false,
-          isLocked: false,
-        },
-      ],
-    },
-    {
-      id: "3",
-      title: "Data Binding and Directives",
-      isCompleted: false,
-      isExpanded: false,
-      lessons: [
-        {
-          id: "11",
-          title: "Two-way Data Binding",
-          type: "video",
-          duration: 25,
-          isCompleted: false,
-          isLocked: true,
-        },
-        {
-          id: "12",
-          title: "Structural Directives",
-          type: "text",
-          duration: 30,
-          isCompleted: false,
-          isLocked: true,
-        },
-        {
-          id: "13",
-          title: "Attribute Directives",
-          type: "video",
-          duration: 25,
-          isCompleted: false,
-          isLocked: true,
-        },
-      ],
-    },
-  ]);
-
-  const [currentLesson, setCurrentLesson] = useState<Lesson>(() => {
-    // If lessonId is provided, find that specific lesson
-    if (lessonId) {
-      for (const module of modules) {
-        const lesson = module.lessons.find((l) => l.id === lessonId);
-        if (lesson) return lesson;
-      }
-    }
-
-    // If moduleId is provided, find the first lesson in that module
-    if (moduleId) {
-      const module = modules.find((m) => m.id === moduleId);
-      if (module && module.lessons.length > 0) {
-        return module.lessons[0];
-      }
-    }
-
-    // Default to first lesson
-    return modules[0].lessons[0];
-  });
-
+  const [modules, setModules] = useState<Module[]>([]);
+  const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [showAIChat, setShowAIChat] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -244,50 +94,68 @@ export const StudyPage: React.FC<StudyPageProps> = ({
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  // Expand the module containing the current lesson and set initial state
   useEffect(() => {
-    if (moduleId || lessonId) {
-      setModules((prev) =>
-        prev.map((module) => {
-          // If specific moduleId provided, expand that module
-          if (moduleId && module.id === moduleId) {
-            return { ...module, isExpanded: true };
-          }
-          // If lessonId provided, expand the module containing that lesson
-          if (
-            lessonId &&
-            module.lessons.some((lesson) => lesson.id === lessonId)
-          ) {
-            return { ...module, isExpanded: true };
-          }
-          return module;
-        })
-      );
-    }
-  }, [moduleId, lessonId]);
+    // Fetch chapters from backend and map to modules/lessons (same logic as SubjectInfoPage)
+    const getModules = async () => {
+      try {
+        const chaptersData = await fetchChapters();
+        // สมมติว่า data[0] คือเอกสารที่ต้องการ (อาจต้องปรับตาม subject)
+        const doc = chaptersData[0];
+        if (doc && doc.chapters && doc.chapters.length > 0) {
+          const [mainChapter, ...lessonChapters] = doc.chapters;
+          setModules([
+            {
+              id: "1",
+              title: mainChapter.chapterName,
+              isCompleted: false,
+              isExpanded: true,
+              lessons: lessonChapters.map((chapter: any, idx: number) => ({
+                id: String(idx + 2),
+                title: chapter.chapterName,
+                type: "text",
+                duration: 30,
+                isCompleted: false,
+                isLocked: false,
+                content: chapter.content,
+              })),
+            },
+          ]);
+        } else {
+          setModules([]);
+        }
+      } catch (e) {
+        setModules([]);
+      }
+    };
+    getModules();
+  }, []);
 
-  // Fetch lesson content when currentLesson changes
+  useEffect(() => {
+    // Set first lesson as current after modules loaded
+    if (modules.length > 0 && !currentLesson) {
+      setCurrentLesson(modules[0].lessons[0]);
+    }
+  }, [modules]);
+
   useEffect(() => {
     const fetchContent = async () => {
       setLoadingContent(true);
       try {
-        // Assuming lessonId maps to chapterId in backend
-        const data = await fetchChapter(currentLesson.id);
-        setCurrentLesson((prev) => ({ ...prev, content: data.content }));
+        if (currentLesson) {
+          const data = await fetchChapter(currentLesson.id);
+          setCurrentLesson((prev) => prev ? { ...prev, content: data.content } : null);
+        }
       } catch {
-        setCurrentLesson((prev) => ({
-          ...prev,
-          content: "Failed to load content.",
-        }));
+        setCurrentLesson((prev) => prev ? { ...prev, content: "Failed to load content." } : null);
       } finally {
         setLoadingContent(false);
       }
     };
-    if (!currentLesson.content) {
+    if (currentLesson && !currentLesson.content) {
       fetchContent();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLesson.id]);
+  }, [currentLesson?.id]);
 
   const toggleModule = (moduleId: string) => {
     setModules((prev) =>
@@ -311,7 +179,7 @@ export const StudyPage: React.FC<StudyPageProps> = ({
       prev.map((module) => ({
         ...module,
         lessons: module.lessons.map((lesson) =>
-          lesson.id === currentLesson.id
+          lesson.id === currentLesson?.id
             ? { ...lesson, isCompleted: true }
             : lesson
         ),
@@ -325,7 +193,7 @@ export const StudyPage: React.FC<StudyPageProps> = ({
       prev.map((module) => ({
         ...module,
         lessons: module.lessons.map((lesson) =>
-          lesson.id === currentLesson.id
+          lesson.id === currentLesson?.id
             ? { ...lesson, isCompleted: false }
             : lesson
         ),
@@ -385,14 +253,13 @@ export const StudyPage: React.FC<StudyPageProps> = ({
       total + module.lessons.filter((lesson) => lesson.isCompleted).length,
     0
   );
-  const progressPercentage = Math.round(
+  const progressPercentage = totalLessons > 0 ? Math.round(
     (completedLessons / totalLessons) * 100
-  );
+  ) : 0;
 
-  const currentLessonIndex =
-    modules
-      .flatMap((m) => m.lessons)
-      .findIndex((l) => l.id === currentLesson.id) + 1;
+  const currentLessonIndex = currentLesson
+    ? modules.flatMap((m) => m.lessons).findIndex((l) => l.id === currentLesson.id) + 1
+    : 0;
 
   return (
     <div
@@ -552,7 +419,7 @@ export const StudyPage: React.FC<StudyPageProps> = ({
                       <div className="ml-6 mt-2 space-y-1">
                         {module.lessons.map((lesson) => {
                           const Icon = getTypeIcon(lesson.type);
-                          const isActive = lesson.id === currentLesson.id;
+                          const isActive = lesson.id === currentLesson?.id;
 
                           return (
                             <button
@@ -630,7 +497,7 @@ export const StudyPage: React.FC<StudyPageProps> = ({
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    {currentLesson.isCompleted ? (
+                    {currentLesson?.isCompleted ? (
                       <button
                         onClick={markAsUndone}
                         className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center"
@@ -654,7 +521,7 @@ export const StudyPage: React.FC<StudyPageProps> = ({
                     darkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
-                  {currentLesson.title}
+                  {currentLesson?.title}
                 </h1>
               </div>
 
@@ -668,56 +535,12 @@ export const StudyPage: React.FC<StudyPageProps> = ({
                   {loadingContent ? (
                     <p>Loading content...</p>
                   ) : (
-                    <p className="text-lg leading-relaxed mb-6">
-                      {currentLesson.content}
-                    </p>
+                    <div className="text-lg leading-relaxed mb-6">
+                      {`${currentLesson?.content}`}
+                    </div>
                   )}
 
-                  <h2
-                    className={`text-xl font-semibold mb-4 transition-colors duration-300 ${
-                      darkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    What is Angular?
-                  </h2>
-
-                  <p className="mb-6">
-                    Angular is a comprehensive framework, meaning it provides a
-                    complete solution for building the client-side of web
-                    applications. It's built and maintained by Google and a
-                    large community of developers. At its heart, Angular is
-                    based on components, which are reusable building blocks that
-                    encapsulate HTML, CSS, and TypeScript code.
-                  </p>
-
-                  <h2
-                    className={`text-xl font-semibold mb-4 transition-colors duration-300 ${
-                      darkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    Key Features of Angular
-                  </h2>
-
-                  <ul className="list-disc pl-6 mb-6 space-y-2">
-                    <li>
-                      <strong>Component-Based Architecture:</strong> Angular
-                      applications are built as a hierarchy of components, each
-                      responsible for a specific part of the user interface.
-                    </li>
-                    <li>
-                      <strong>TypeScript Integration:</strong> Angular is built
-                      with TypeScript, providing strong typing, better tooling,
-                      and enhanced developer experience.
-                    </li>
-                    <li>
-                      <strong>Dependency Injection:</strong> A design pattern
-                      that makes applications more modular and testable.
-                    </li>
-                    <li>
-                      <strong>Routing:</strong> Built-in router for creating
-                      single-page applications with multiple views.
-                    </li>
-                  </ul>
+                 
                 </div>
               </div>
             </div>

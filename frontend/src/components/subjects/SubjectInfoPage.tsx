@@ -80,8 +80,8 @@ export const SubjectInfoPage: React.FC<SubjectInfoPageProps> = ({
               isCompleted: false,
               isLocked: false,
               estimatedTime: 30,
-              lessons: lessonChapters.map((chapter: any, idx: number) => ({
-                id: String(idx + 2),
+              lessons: lessonChapters.map((chapter: any) => ({
+                id: chapter._id,
                 title: chapter.chapterName,
                 type: "text",
                 duration: 30,
